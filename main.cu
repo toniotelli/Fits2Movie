@@ -44,6 +44,12 @@ int main(int argc, const char * argv[]){
         printf("Usage : %s out.mkv *.fits\n",argv[0]);
         return -1;
     }
+    int itMovie=1,itScale[]={2,3},itStart=4;
+    double dmin=atof(argv[itScale[0]]);
+    double dmax=atof(argv[itScale[1]]);
+
+    printf("Scaling parameters : %f,%f",dmin,dmax);
+
     // Cuda
     int nbCuda=0;
     nbCuda=checkCudaDevice();
@@ -55,8 +61,11 @@ int main(int argc, const char * argv[]){
     int min=0,max=0;
     
     // Get image dimension
-    status=getImageSize(argv[2],imgSize,&min,&max);
-
+    status=getImageSize(argv[itStart],imgSize,&min,&max);
+    if (status != 0) {
+    	fits_report_error(stderr,status);
+    	exit(-1);
+    }
     // AVCodec variable
     struct AVFormatContext *oc;
     struct AVCodec *avCodec;
@@ -76,11 +85,11 @@ int main(int argc, const char * argv[]){
     
     // Open Movie file and alloc necessary stuff
     remove(argv[1]);
-    openFormat(argv[1], &oc);
+    openFormat(argv[itMovie], &oc);
     openStream(oc, &avCodec, &avStream, imgSize[1], imgSize[2], 30);
     openCodec(&avCodec, avStream);
     allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV);
-    writeHeader(argv[1], oc);
+    writeHeader(argv[itMovie], oc);
     printf("Using %s: %s\nCodec: %s\n",oc->oformat->name,oc->oformat->long_name,avcodec_get_name(oc->oformat->video_codec));
     
     // Get a pos just to check
@@ -99,18 +108,18 @@ int main(int argc, const char * argv[]){
     void *dData;
     cudaMalloc((void **)&dData, sData);
     
-    for (int i=2; i<argc; i++) {
+    for (int i=itStart; i<argc; i++) {
         printf("Fits: %s\n",argv[i]);
         status=readFits(argv[i],data, imgSize,&min,&max);
         printf("data[%i,%i]=%f\n",y,x,((double *)data)[pos]);
-        printf("data[min,max]=[%f,%f]\n",(double)min,(double)max);
+        printf("data[min,max]=[%f,%f]\n",dmin,dmax);
         
         // copy data to device
         cudaMemcpy(dData, data, sData, cudaMemcpyHostToDevice);
         check_CUDA_error("Copying H to D");
         
         // launch the process
-        launchConvertion(dbRGB, dData, imgSize[1], imgSize[2], min, max);
+        launchConvertion(dbRGB, dData, imgSize[1], imgSize[2], dmin, dmax);
         
         // copy back buffRGB to host
         cudaMemcpy(hbRGB,dbRGB,bRGB,cudaMemcpyDeviceToHost);

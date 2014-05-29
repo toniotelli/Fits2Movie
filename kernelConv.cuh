@@ -25,7 +25,7 @@
 //#include <math_functions.h>
 
 __global__ void convert_fits_RGB(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD);
-void launchConvertion(uint8_t *buff, void *data, int nx, int ny, int minD, int maxD);
+void launchConvertion(uint8_t *buff, void *data, int nx, int ny, double minD, double maxD);
 
 // Cuda handling
 void check_CUDA_error(const char *message);

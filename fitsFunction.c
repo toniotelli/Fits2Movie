@@ -24,7 +24,7 @@ size_t allocDataType(void **data,int datatype,int nx, int ny){
 }
 int getImageSize(const char *filename,int *imgS, int *min, int *max){
 	fitsfile *fts;
-	int status;
+	int status=0;
 
 	// open file
 	fits_open_file(&fts,filename,READONLY,&status);
@@ -41,12 +41,13 @@ int getImageSize(const char *filename,int *imgS, int *min, int *max){
 	// Read DATAMIN, DATAMAX
 	fits_read_key(fts,TINT,"DATAMIN",(void *)min,NULL,&status);
 	fits_read_key(fts,TINT,"DATAMAX",(void *)max,NULL,&status);
+	*min=*min-1;
+	*max=*max+1;
 
 	// close the file
 	fits_close_file(fts,&status);
 	return status;
 }
-
 int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	fitsfile *fts;
 	int status=0,datatype=0;
@@ -61,6 +62,8 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	// Read DATAMIN, DATAMAX
 	fits_read_key(fts,TINT,"DATAMIN",(void *)min,NULL,&status);
 	fits_read_key(fts,TINT,"DATAMAX",(void *)max,NULL,&status);
+	*min=*min-1;
+	*max=*max+1;
 
 	// Data type
 	switch(imgS[0]) {

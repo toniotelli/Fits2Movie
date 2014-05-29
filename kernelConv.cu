@@ -5,29 +5,33 @@ __global__ void convert_fits_RGB(uint8_t *buff, double *data, int nx, int ny, do
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
 	int CC=y*nx+x;
 	double temp=0;
-	printf("data[%i]=%f\n",CC,data[CC]);
+//	printf("data[%i]=%f\n",CC,data[CC]);
 
 	if (CC < nx*ny){
-		temp = (data[CC]-minD)/(maxD-minD)*255;
-		buff[3*CC]=(1.44068*temp > 255) ? 1.44068*temp : 255;
-		buff[3*CC+1]=temp;
-		buff[3*CC+2]=(temp <= 190) ? 0 : 3.92308*temp;
+		if (data[CC] < minD) {
+			temp =0;
+		} else if (data[CC] > maxD){
+			temp =255;
+		} else {
+			temp = (data[CC]-minD)/(maxD-minD)*255;
+		}
+		// attempt to emule loadct data
+		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
+		buff[3*CC+1]=(uint8_t)(temp);
+		buff[3*CC+2]=(uint8_t)((temp <= 190) ? 0 : 3.92308*temp);
 	}
 }
-void launchConvertion(uint8_t *buff, void *data, int nx, int ny, int minD, int maxD){
+void launchConvertion(uint8_t *buff, void *data, int nx, int ny, double minD, double maxD){
 	dim3 dimB(BLOCKX,BLOCKY);
 	dim3 dimG(nx/BLOCKX,ny/BLOCKY);
 
 	printf("%i,%i\n",nx,ny);
 	printf("%i,%i\n",nx/32,ny/32);
 
-	double minDD=minD;
-	double maxDD=maxD;
-	printf("%i,%i\n",minD,minD);
-	printf("%f,%f\n",minDD,maxDD);
+	printf("Scaling = %f,%f\n",minD,minD);
 
 	// lauch kernel
-	convert_fits_RGB<<<dimG,dimB>>>(buff,(double *)data,nx,ny,minDD,maxDD);
+	convert_fits_RGB<<<dimG,dimB>>>(buff,(double *)data,nx,ny,minD,maxD);
 	cudaDeviceSynchronize();
 	check_CUDA_error("Convertion");
 }
