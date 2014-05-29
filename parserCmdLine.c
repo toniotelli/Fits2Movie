@@ -23,6 +23,9 @@ int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments
 			arguments->scale=1;
 			sscanf(optarg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
 			break;
+		case 'f':
+			arguments->fps=atoi(optarg);
+			break;
 		case '?':
 			if (optopt == 'd') fprintf(stderr,"Option %c requires an arguments.\n",optopt);
 			return 1;
@@ -46,6 +49,9 @@ error_t parse_opt (int key, char *arg, struct argp_state *state){
 	case 's':
 		arguments->scale=1;
 		sscanf(arg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
+		break;
+	case 'f':
+		arguments->fps=atoi(arg);
 		break;
 	case ARGP_KEY_ARG:
 		arguments->output=arg;

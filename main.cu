@@ -38,6 +38,7 @@ int main(int argc, char * argv[]){
 	printf("Welcome to %s!\n",argv[0]);
 	struct arguments arguments;
 	arguments.scale=0;
+	arguments.fps=30;
 
 #ifndef __APPLE__
 	int errorparse = argp_parse (&argp, argc, argv, 0, 0, &arguments);
@@ -100,12 +101,12 @@ int main(int argc, char * argv[]){
 	remove(arguments.output);
 	openFormat(arguments.output, &oc);
 	if (arguments.scale == 1){
-		openStream(oc, &avCodec, &avStream, arguments.NXNY[0], arguments.NXNY[1], 30);
+		openStream(oc, &avCodec, &avStream, arguments.NXNY[0], arguments.NXNY[1], arguments.fps);
 		openCodec(&avCodec, avStream);
 		allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV, imgSize[1], imgSize[2]);
 		allocFrameConversion(&frameYUVConv,hbYUVConv,arguments.NXNY[0],arguments.NXNY[1]);
 	} else {
-		openStream(oc, &avCodec, &avStream, imgSize[1], imgSize[2], 30);
+		openStream(oc, &avCodec, &avStream, imgSize[1], imgSize[2], arguments.fps);
 		openCodec(&avCodec, avStream);
 		allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV, imgSize[1], imgSize[2]);
 	}

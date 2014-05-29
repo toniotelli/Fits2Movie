@@ -21,9 +21,10 @@ struct arguments{
 	double dMinMax[2];
 	int NXNY[2];
 	int scale;
+	int fps;
 };
 
-static const char optString[]="d:s::";
+static const char optString[]="d:s::f::";
 int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments);
 
 #else
@@ -36,8 +37,9 @@ static char args_doc[]="Output.mkv *.fits";
 
 /* Programme option */
 static struct argp_option options[]={
-		{"dataScale",'d',"dmin:dmax",OPTION_ARG_OPTIONAL,"Data value for data scaling"},
-		{"imageSize",'s',"nx:ny",OPTION_ARG_OPTIONAL,"resize YUV image to used Defined"},
+		{"scale",'d',"dmin:dmax",OPTION_ARG_OPTIONAL,"Data value for data scaling"},
+		{"size",'s',"nx:ny",OPTION_ARG_OPTIONAL,"resize YUV image to used Defined"},
+		{"fps",'f',"fps",OPTION_ARG_OPTIONAL,"User defined fps (Frame per second"},
 		{0}
 };
 
@@ -47,6 +49,7 @@ struct arguments{
 	double dMinMax[2];
 	int NXNY[2];
 	int scale;
+	int fps;
 };
 
 error_t parse_opt (int key, char *arg, struct argp_state *state);
