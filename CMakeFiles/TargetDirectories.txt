@@ -1,1 +1,0 @@
-/Users/tonio/git/Fits2Movie/CMakeFiles/Fits2Movies.dir

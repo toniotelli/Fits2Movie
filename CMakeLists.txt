@@ -7,6 +7,10 @@ set(binary_dir ${CMAKE_CURRENT_BINARY_DIR})
 
 set(BUILD_SHARED_LIBS ON)
 
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
+set(CMAKE_C_COMPILER /usr/bin/gcc)
+set(CMAKE_C_LINK_EXECUTABLE /usr/bin/gcc)
+
 #find cuda
 find_package(CUDA REQUIRED)
 if(CUDA_FOUND)
@@ -64,11 +68,29 @@ ${SWRESAMPLE_INCLUDE_DIRS}
 ${CFITSIO_INCLUDE_DIRS}
 ${cuda_path}/include
 ${cuda_path}/samples/common/inc
+${source_dir}
+${binary_dir}
 )
 
-# Set cuda compilation flags
-set(custom_cuda_flags "-ccbin clang -g -gencode arch=compute_10,code=sm_10")
-set(CUDA_NVCC_FLAGS ${custom_cuda_flags})
+# PARAMETER THE LIBRARY
+set(libsCuda "-L${cuda_path}/lib64 -lcuda")
 
-CUDA_ADD_EXECUTABLE(Fits2Movies main.cu kernelConv.cu fitsFunction.c aviFunction.c)
-TARGET_LINK_LIBRARIES(${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES} ${CFITSIO_LIBRARIES})
+
+# Set cuda compilation flags
+set(custom_cuda_flags "-g -gencode arch=compute_35,code=sm_35")
+set(CUDA_NVCC_FLAGS ${custom_cuda_flags})
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive")
+
+# Message
+message("avcodec: ${AVCODEC_LIBRARIES}")
+
+
+CUDA_ADD_EXECUTABLE(Fits2Movies main.cu kernelConv.cu kernelConv.cuh fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)
+TARGET_LINK_LIBRARIES(Fits2Movies ${libsCuda} ${CFITSIO_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
+
+#CUDA_ADD_EXECUTABLE(Fits2Movies main.cu)# kernelConv.cu kernelConv.cuh)# fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)
+#cuda_add_library(cudaLib STATIC kernelConv.cu kernelConv.cuh)
+#add_library(cpuFunc STATIC fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)
+#TARGET_LINK_LIBRARIES(Fits2Movies cudaLib cpuFunc ${libsCuda} ${CFITSIO_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
+
+

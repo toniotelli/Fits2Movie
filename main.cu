@@ -6,15 +6,36 @@
 //  Copyright (c) 2014 Antoine Genetelli. All rights reserved.
 //
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <fitsio.h>
+#include <stdint.h>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 
-#include "fitsFunction.h"
-#include "aviFunction.h"
 #include "kernelConv.cuh"
+
+extern "C" {
+//#include <libavutil/opt.h>
+//#include <libavcodec/avcodec.h>
+//#include <libavformat/avformat.h>
+//#include <libavutil/avconfig.h>
+//#include <libavutil/channel_layout.h>
+//#include <libavutil/common.h>
+//#include <libavutil/imgutils.h>
+//#include <libavutil/mathematics.h>
+//#include <libavutil/samplefmt.h>
+//#include <libswscale/swscale.h>
+//#include <libswresample/swresample.h>
+//#include <libavutil/timestamp.h>
+#include "aviFunction.h"
+#include "fitsFunction.h"
+
+}
 
 int main(int argc, const char * argv[]){
     printf("Welcome to %s!\n",argv[0]);

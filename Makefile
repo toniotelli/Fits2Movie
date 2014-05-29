@@ -43,10 +43,10 @@ RM = /usr/local/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/tonio/git/Fits2Movie
+CMAKE_SOURCE_DIR = /home/tonio/git/Fits2Movie
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/tonio/git/Fits2Movie
+CMAKE_BINARY_DIR = /home/tonio/git/Fits2Movie
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -73,9 +73,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tonio/git/Fits2Movie/CMakeFiles /Users/tonio/git/Fits2Movie/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/tonio/git/Fits2Movie/CMakeFiles /home/tonio/git/Fits2Movie/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tonio/git/Fits2Movie/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/tonio/git/Fits2Movie/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -115,12 +115,38 @@ Fits2Movies/fast:
 	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/build
 .PHONY : Fits2Movies/fast
 
+#=============================================================================
+# Target rules for targets named cpuFunc
+
+# Build rule for target.
+cpuFunc: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cpuFunc
+.PHONY : cpuFunc
+
+# fast build rule for target.
+cpuFunc/fast:
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/build
+.PHONY : cpuFunc/fast
+
+#=============================================================================
+# Target rules for targets named cudaLib
+
+# Build rule for target.
+cudaLib: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cudaLib
+.PHONY : cudaLib
+
+# fast build rule for target.
+cudaLib/fast:
+	$(MAKE) -f CMakeFiles/cudaLib.dir/build.make CMakeFiles/cudaLib.dir/build
+.PHONY : cudaLib/fast
+
 aviFunction.o: aviFunction.c.o
 .PHONY : aviFunction.o
 
 # target to build an object file
 aviFunction.c.o:
-	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/aviFunction.c.o
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/aviFunction.c.o
 .PHONY : aviFunction.c.o
 
 aviFunction.i: aviFunction.c.i
@@ -128,7 +154,7 @@ aviFunction.i: aviFunction.c.i
 
 # target to preprocess a source file
 aviFunction.c.i:
-	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/aviFunction.c.i
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/aviFunction.c.i
 .PHONY : aviFunction.c.i
 
 aviFunction.s: aviFunction.c.s
@@ -136,7 +162,7 @@ aviFunction.s: aviFunction.c.s
 
 # target to generate assembly for a file
 aviFunction.c.s:
-	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/aviFunction.c.s
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/aviFunction.c.s
 .PHONY : aviFunction.c.s
 
 fitsFunction.o: fitsFunction.c.o
@@ -144,7 +170,7 @@ fitsFunction.o: fitsFunction.c.o
 
 # target to build an object file
 fitsFunction.c.o:
-	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/fitsFunction.c.o
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/fitsFunction.c.o
 .PHONY : fitsFunction.c.o
 
 fitsFunction.i: fitsFunction.c.i
@@ -152,7 +178,7 @@ fitsFunction.i: fitsFunction.c.i
 
 # target to preprocess a source file
 fitsFunction.c.i:
-	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/fitsFunction.c.i
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/fitsFunction.c.i
 .PHONY : fitsFunction.c.i
 
 fitsFunction.s: fitsFunction.c.s
@@ -160,7 +186,7 @@ fitsFunction.s: fitsFunction.c.s
 
 # target to generate assembly for a file
 fitsFunction.c.s:
-	$(MAKE) -f CMakeFiles/Fits2Movies.dir/build.make CMakeFiles/Fits2Movies.dir/fitsFunction.c.s
+	$(MAKE) -f CMakeFiles/cpuFunc.dir/build.make CMakeFiles/cpuFunc.dir/fitsFunction.c.s
 .PHONY : fitsFunction.c.s
 
 # Help Target
@@ -170,6 +196,8 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... Fits2Movies"
+	@echo "... cpuFunc"
+	@echo "... cudaLib"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... aviFunction.o"

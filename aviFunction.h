@@ -36,5 +36,4 @@ void writeHeader(const char *filename,AVFormatContext *oc);
 void rescaleRGBToYUV(AVFrame *framergb, AVFrame *frameyuv, uint8_t *buffrgb, uint8_t *buffyuv, size_t sizeB1);
 void encodeOneFrameYUV(AVFormatContext *oc,AVStream *st,AVFrame *frmyuv, int i);
 
-
 #endif

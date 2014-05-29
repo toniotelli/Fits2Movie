@@ -9,17 +9,22 @@
 #ifndef Fits2Movie_kernelConv_cuh
 #define Fits2Movie_kernelConv_cuh
 
-#define BLOCKX 16
-#define BLOCKY 16
+#define BLOCKX 32
+#define BLOCKY 32
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <fitsio.h>
+#include <stdint.h>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 //#include <math_functions.h>
 
-__global__ void convert_fits_RGB(uint8_t *buff, void *data, int nx, int minD, int maxD);
+__global__ void convert_fits_RGB(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD);
 void launchConvertion(uint8_t *buff, void *data, int nx, int ny, int minD, int maxD);
 
 // Cuda handling

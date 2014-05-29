@@ -100,7 +100,7 @@ void allocFrames(AVStream *st, AVFrame **frameRGB, AVFrame **frameYUV, uint8_t *
     
 	printf("Frames allocated with buffers size: %i, %i\n",sB1,sB2);
 }
-void deallacFrames(AVFrame *frameRGB, AVFrame *frameYUV, uint8_t *buffRGB, uint8_t *buffYUV){
+void deallocFrames(AVFrame *frameRGB, AVFrame *frameYUV, uint8_t *buffRGB, uint8_t *buffYUV){
 	// Free
 	free(buffRGB);
 	free(buffYUV);
