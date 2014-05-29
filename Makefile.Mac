@@ -98,8 +98,8 @@ endif
 INCLUDES      := -I$(CUDA_INC_PATH) -I. $(PROJ_INCLUDES)
 
 # Source and object
-SRCS := main.c aviFunction.c fitsFunction.c kernelConv.cu
-OBJS := main.o aviFunction.o fitsFunction.o kernelConv.o
+SRCS := main.c parserCmdLine.c aviFunction.c fitsFunction.c kernelConv.cu
+OBJS := main.o parserCmdLine.c aviFunction.o fitsFunction.o kernelConv.o
 
 # Target rules
 all: $(project_name)

@@ -48,6 +48,9 @@ int checkCudaDevice(){
 	int NBCudaDev=0;
 	int devN=0;
 	cudaGetDeviceCount(&NBCudaDev);
+	if (NBCudaDev > 1){
+		devN=0;
+	}
 
 	cudaSetDevice(devN);
 	cudaGetDevice(&devN);

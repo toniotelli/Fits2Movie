@@ -51,6 +51,7 @@ int getImageSize(const char *filename,int *imgS, int *min, int *max){
 int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	fitsfile *fts;
 	int status=0,datatype=0;
+	double nulval=0;
 
 	// open file
 	fits_open_file(&fts,filename,READONLY,&status);
@@ -64,6 +65,7 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	fits_read_key(fts,TINT,"DATAMAX",(void *)max,NULL,&status);
 	*min=*min-1;
 	*max=*max+1;
+	printf("[min,max]=[%i,%i]\n",*min,*max);
 
 	// Data type
 	switch(imgS[0]) {
@@ -85,7 +87,7 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	}
 
 	// Read the image
-	fits_read_img(fts, datatype, 1, imgS[1]*imgS[2], 0, data, NULL, &status);
+	fits_read_img(fts, datatype, 1, imgS[1]*imgS[2], (void *)&nulval, data, NULL, &status);
 	if (status != 0 ){
 		fits_report_error(stderr,status);
 		exit(-1);

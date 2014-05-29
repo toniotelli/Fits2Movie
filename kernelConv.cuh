@@ -9,8 +9,13 @@
 #ifndef Fits2Movie_kernelConv_cuh
 #define Fits2Movie_kernelConv_cuh
 
-#define BLOCKX 32
-#define BLOCKY 32
+#ifndef __APPLE__
+	#define BLOCKX 32
+	#define BLOCKY 32
+#else
+	#define BLOCKX 16
+	#define BLOCKY 16
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
