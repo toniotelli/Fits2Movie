@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <fitsio.h>
 #include <stdint.h>
-
+#include <argp.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
@@ -20,33 +20,24 @@
 #include "kernelConv.cuh"
 
 extern "C" {
-//#include <libavutil/opt.h>
-//#include <libavcodec/avcodec.h>
-//#include <libavformat/avformat.h>
-//#include <libavutil/avconfig.h>
-//#include <libavutil/channel_layout.h>
-//#include <libavutil/common.h>
-//#include <libavutil/imgutils.h>
-//#include <libavutil/mathematics.h>
-//#include <libavutil/samplefmt.h>
-//#include <libswscale/swscale.h>
-//#include <libswresample/swresample.h>
-//#include <libavutil/timestamp.h>
+// Argp
+const char *argp_program_version ="Fits2Movie 0.1";
+const char *argp_program_bug_address ="<antoine.genetelli@mac.com>";
+
 #include "aviFunction.h"
 #include "fitsFunction.h"
-
+#include "parserCmdLine.h"
 }
 
-int main(int argc, const char * argv[]){
-    printf("Welcome to %s!\n",argv[0]);
+int main(int argc, char * argv[]){
+	printf("Welcome to %s!\n",argv[0]);
+	struct arguments arguments;
+	int errorparse = argp_parse (&argp, argc, argv, 0, 0, &arguments);
     printf("Number of files = %i\n",argc);
-    if (argc == 1) {
-        printf("Usage : %s out.mkv *.fits\n",argv[0]);
-        return -1;
-    }
+
     int itMovie=1,itScale[]={2,3},itStart=4;
-    double dmin=atof(argv[itScale[0]]);
-    double dmax=atof(argv[itScale[1]]);
+    double dmin=arguments.dMinMax[0];
+    double dmax=arguments.dMinMax[1];
 
     printf("Scaling parameters : %f,%f",dmin,dmax);
 
@@ -61,7 +52,7 @@ int main(int argc, const char * argv[]){
     int min=0,max=0;
     
     // Get image dimension
-    status=getImageSize(argv[itStart],imgSize,&min,&max);
+    status=getImageSize(argv[arguments.itStart],imgSize,&min,&max);
     if (status != 0) {
     	fits_report_error(stderr,status);
     	exit(-1);
@@ -84,12 +75,12 @@ int main(int argc, const char * argv[]){
     av_log_set_level(AV_LOG_INFO);
     
     // Open Movie file and alloc necessary stuff
-    remove(argv[1]);
-    openFormat(argv[itMovie], &oc);
+    remove(arguments.output);
+    openFormat(arguments.output, &oc);
     openStream(oc, &avCodec, &avStream, imgSize[1], imgSize[2], 30);
     openCodec(&avCodec, avStream);
     allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV);
-    writeHeader(argv[itMovie], oc);
+    writeHeader(arguments.output, oc);
     printf("Using %s: %s\nCodec: %s\n",oc->oformat->name,oc->oformat->long_name,avcodec_get_name(oc->oformat->video_codec));
     
     // Get a pos just to check

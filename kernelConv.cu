@@ -28,7 +28,7 @@ void launchConvertion(uint8_t *buff, void *data, int nx, int ny, double minD, do
 	printf("%i,%i\n",nx,ny);
 	printf("%i,%i\n",nx/32,ny/32);
 
-	printf("Scaling = %f,%f\n",minD,minD);
+	printf("Scaling = %lf,%lf\n",minD,minD);
 
 	// lauch kernel
 	convert_fits_RGB<<<dimG,dimB>>>(buff,(double *)data,nx,ny,minD,maxD);

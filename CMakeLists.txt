@@ -84,9 +84,9 @@ set(CUDA_NVCC_FLAGS ${custom_cuda_flags})
 # Message
 message("avcodec: ${AVCODEC_LIBRARIES}")
 
-
+add_library(parserlib STATIC parserCmdLine.c parserCmdLine.h)
 CUDA_ADD_EXECUTABLE(Fits2Movies main.cu kernelConv.cu kernelConv.cuh fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)
-TARGET_LINK_LIBRARIES(Fits2Movies ${libsCuda} ${CFITSIO_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
+TARGET_LINK_LIBRARIES(Fits2Movies parserlib ${libsCuda} ${CFITSIO_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
 
 #CUDA_ADD_EXECUTABLE(Fits2Movies main.cu)# kernelConv.cu kernelConv.cuh)# fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)
 #cuda_add_library(cudaLib STATIC kernelConv.cu kernelConv.cuh)
