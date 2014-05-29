@@ -1,6 +1,7 @@
 #include "kernelConv.cuh"
 
-__global__ void convert_fits_RGB(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD){
+// Convertion to 171 colormap
+__global__ void convert_fits_RGB_double_171(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
 	int CC=y*nx+x;
@@ -21,17 +22,118 @@ __global__ void convert_fits_RGB(uint8_t *buff, double *data, int nx, int ny, do
 		buff[3*CC+2]=(uint8_t)((temp <= 190) ? 0 : 3.92308*temp);
 	}
 }
-void launchConvertion(uint8_t *buff, void *data, int nx, int ny, double minD, double maxD){
+__global__ void convert_fits_RGB_float_171(uint8_t *buff, float *data, int nx, int ny, float minD, float maxD){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int CC=y*nx+x;
+	double temp=0;
+//	printf("data[%i]=%f\n",CC,data[CC]);
+
+	if (CC < nx*ny){
+		if (data[CC] < minD) {
+			temp =0;
+		} else if (data[CC] > maxD){
+			temp =255;
+		} else {
+			temp = (data[CC]-minD)/(maxD-minD)*255;
+		}
+		// attempt to emule loadct data
+		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
+		buff[3*CC+1]=(uint8_t)(temp);
+		buff[3*CC+2]=(uint8_t)((temp <= 190) ? 0 : 3.92308*temp);
+	}
+}
+__global__ void convert_fits_RGB_long_171(uint8_t *buff, long *data, int nx, int ny, long minD, long maxD){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int CC=y*nx+x;
+	double temp=0;
+//	printf("data[%i]=%f\n",CC,data[CC]);
+
+	if (CC < nx*ny){
+		if (data[CC] < minD) {
+			temp =0;
+		} else if (data[CC] > maxD){
+			temp =255;
+		} else {
+			temp = (data[CC]-minD)/(maxD-minD)*255;
+		}
+		// attempt to emule loadct data
+		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
+		buff[3*CC+1]=(uint8_t)(temp);
+		buff[3*CC+2]=(uint8_t)((temp <= 190) ? 0 : 3.92308*temp);
+	}
+}
+__global__ void convert_fits_RGB_shortInt_171(uint8_t *buff, short int *data, int nx, int ny, short int minD, short int maxD){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int CC=y*nx+x;
+	double temp=0;
+//	printf("data[%i]=%f\n",CC,data[CC]);
+
+	if (CC < nx*ny){
+		if (data[CC] < minD) {
+			temp =0;
+		} else if (data[CC] > maxD){
+			temp =255;
+		} else {
+			temp = (data[CC]-minD)/(maxD-minD)*255;
+		}
+		// attempt to emule loadct data
+		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
+		buff[3*CC+1]=(uint8_t)(temp);
+		buff[3*CC+2]=(uint8_t)((temp <= 190) ? 0 : 3.92308*temp);
+	}
+}
+__global__ void convert_fits_RGB_uchar_171(uint8_t *buff, unsigned char *data, int nx, int ny, unsigned char minD, unsigned char maxD){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int CC=y*nx+x;
+	double temp=0;
+//	printf("data[%i]=%f\n",CC,data[CC]);
+
+	if (CC < nx*ny){
+		if (data[CC] < minD) {
+			temp =0;
+		} else if (data[CC] > maxD){
+			temp =255;
+		} else {
+			temp = (data[CC]-minD)/(maxD-minD)*255;
+		}
+		// attempt to emule loadct data
+		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
+		buff[3*CC+1]=(uint8_t)(temp);
+		buff[3*CC+2]=(uint8_t)((temp <= 190) ? 0 : 3.92308*temp);
+	}
+}
+
+
+// launch Convertion
+void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD){
 	dim3 dimB(BLOCKX,BLOCKY);
 	dim3 dimG(nx/BLOCKX,ny/BLOCKY);
 
 	printf("%i,%i\n",nx,ny);
 	printf("%i,%i\n",nx/32,ny/32);
 
-	printf("Scaling = %lf,%lf\n",minD,minD);
-
 	// lauch kernel
-	convert_fits_RGB<<<dimG,dimB>>>(buff,(double *)data,nx,ny,minD,maxD);
+	switch(bitpix){
+	case BYTE_IMG:
+		convert_fits_RGB_uchar_171<<<dimG,dimB>>>(buff,(unsigned char *)data,nx,ny,(unsigned char)minD,(unsigned char)maxD);
+		break;
+	case SHORT_IMG:
+		convert_fits_RGB_shortInt_171<<<dimG,dimB>>>(buff,(short int *)data,nx,ny,(short int)minD,(short int)maxD);
+		break;
+	case LONG_IMG:
+		convert_fits_RGB_long_171<<<dimG,dimB>>>(buff,(long *)data,nx,ny,(long)minD,(long)maxD);
+		break;
+	case FLOAT_IMG:
+		convert_fits_RGB_float_171<<<dimG,dimB>>>(buff,(float *)data,nx,ny,(float)minD,(float)maxD);
+		break;
+	case DOUBLE_IMG:
+		convert_fits_RGB_double_171<<<dimG,dimB>>>(buff,(double *)data,nx,ny,(double)minD,(double)maxD);
+		break;
+	}
 	cudaDeviceSynchronize();
 	check_CUDA_error("Convertion");
 }

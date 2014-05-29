@@ -29,8 +29,15 @@
 #include <cuda_runtime_api.h>
 //#include <math_functions.h>
 
-__global__ void convert_fits_RGB(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD);
-void launchConvertion(uint8_t *buff, void *data, int nx, int ny, double minD, double maxD);
+// Convertion to 171 colormap
+__global__ void convert_fits_RGB_double_171(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD);
+__global__ void convert_fits_RGB_float_171(uint8_t *buff, float *data, int nx, int ny, float minD, float maxD);
+__global__ void convert_fits_RGB_long_171(uint8_t *buff, long *data, int nx, int ny, long minD, long maxD);
+__global__ void convert_fits_RGB_shortInt_171(uint8_t *buff, short int *data, int nx, int ny, short int minD, short int maxD);
+__global__ void convert_fits_RGB_uchar_171(uint8_t *buff, unsigned char *data, int nx, int ny, unsigned char minD, unsigned char maxD);
+
+// launch Convertion
+void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD);
 
 // Cuda handling
 void check_CUDA_error(const char *message);

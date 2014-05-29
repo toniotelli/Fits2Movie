@@ -112,7 +112,7 @@ int main(int argc, char * argv[]){
     for (int i=itStart; i<argc; i++) {
         printf("Fits: %s\n",argv[i]);
         status=readFits(argv[i],data, imgSize,&min,&max);
-        printf("data[%i,%i]=%f\n",y,x,((double *)data)[pos]);
+//        printf("data[%i,%i]=%f\n",y,x,((double *)data)[pos]);
         printf("data[min,max]=[%lf,%lf]\n",dmin,dmax);
         
         // copy data to device
@@ -120,7 +120,7 @@ int main(int argc, char * argv[]){
         check_CUDA_error("Copying H to D");
         
         // launch the process
-        launchConvertion(dbRGB, dData, imgSize[1], imgSize[2], dmin, dmax);
+        launchConvertion(dbRGB, dData, imgSize[0], imgSize[1], imgSize[2], dmin, dmax);
         
         // copy back buffRGB to host
         cudaMemcpy(hbRGB,dbRGB,bRGB,cudaMemcpyDeviceToHost);
