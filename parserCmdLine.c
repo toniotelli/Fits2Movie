@@ -20,6 +20,7 @@ int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments
 			printf("dmin=%lf, dmax= %lf\n",arguments->dMinMax[0],arguments->dMinMax[1]);
 			break;
 		case 's':
+			arguments->scale=1;
 			sscanf(optarg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
 			break;
 		case '?':
@@ -43,6 +44,7 @@ error_t parse_opt (int key, char *arg, struct argp_state *state){
 		sscanf(arg,"=%lf:%lf",&(arguments->dMinMax[0]),&(arguments->dMinMax[1]));
 		break;
 	case 's':
+		arguments->scale=1;
 		sscanf(arg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
 		break;
 	case ARGP_KEY_ARG:

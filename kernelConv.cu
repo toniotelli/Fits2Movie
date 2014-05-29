@@ -107,7 +107,6 @@ __global__ void convert_fits_RGB_uchar_171(uint8_t *buff, unsigned char *data, i
 	}
 }
 
-
 // launch Convertion
 void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD){
 	dim3 dimB(BLOCKX,BLOCKY);
@@ -151,7 +150,7 @@ int checkCudaDevice(){
 	int devN=0;
 	cudaGetDeviceCount(&NBCudaDev);
 	if (NBCudaDev > 1){
-		devN=0;
+		devN=1;
 	}
 
 	cudaSetDevice(devN);

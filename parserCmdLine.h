@@ -20,6 +20,7 @@ struct arguments{
 	int itStart;
 	double dMinMax[2];
 	int NXNY[2];
+	int scale;
 };
 
 static const char optString[]="d:s::";
@@ -45,6 +46,7 @@ struct arguments{
 	int itStart;
 	double dMinMax[2];
 	int NXNY[2];
+	int scale;
 };
 
 error_t parse_opt (int key, char *arg, struct argp_state *state);
