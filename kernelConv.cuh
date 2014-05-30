@@ -29,6 +29,13 @@
 #include <cuda_runtime_api.h>
 //#include <math_functions.h>
 
+// Inline functions in double
+// Red Temperature
+__device__ inline double r0(double temp, int ind);
+__device__ inline double g0(double temp, int ind);
+__device__ inline double b0(double temp, int ind);
+
+
 // Convertion to 171 colormap
 __global__ void convert_fits_RGB_double_171(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD);
 __global__ void convert_fits_RGB_float_171(uint8_t *buff, float *data, int nx, int ny, float minD, float maxD);
