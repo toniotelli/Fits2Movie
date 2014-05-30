@@ -39,16 +39,22 @@ int main(int argc, char * argv[]){
 	struct arguments arguments;
 	arguments.scale=0;
 	arguments.fps=30;
-
+	printf("FPS = %i\n",arguments.fps);
+	int error=0;
 #ifndef __APPLE__
-	int errorparse = argp_parse (&argp, argc, argv, 0, 0, &arguments);
+	error = argp_parse (&argp, argc, argv, 0, 0, &arguments);
 #else
-	int error = parseCmdLine(argc,argv,optString,&arguments);
-	printf("error = %i\n",error);
+	error = parseCmdLine(argc,argv,optString,&arguments);
 #endif
+	printf("error = %i\n",error);
+	if (error != 0){
+		exit(-1);
+	}
 	printf("Number of files = %i\n",argc);
+	printf("Save movie in : %s\n",arguments.output);
+	printf("First fit files = %s\n",argv[arguments.itStart]);
+	printf("FPS = %i\n",arguments.fps);
 
-	int itMovie=1,itScale[]={2,3},itStart=4;
 	double dmin=arguments.dMinMax[0];
 	double dmax=arguments.dMinMax[1];
 
@@ -70,7 +76,9 @@ int main(int argc, char * argv[]){
 		fits_report_error(stderr,status);
 		exit(-1);
 	}
+
 	// AVCodec variable
+	printf("AV struct \n");
 	struct AVFormatContext *oc;
 	struct AVCodec *avCodec;
 	struct AVStream *avStream;
@@ -113,10 +121,6 @@ int main(int argc, char * argv[]){
 	writeHeader(arguments.output, oc);
 	printf("Using %s: %s\nCodec: %s\n",oc->oformat->name,oc->oformat->long_name,avcodec_get_name(oc->oformat->video_codec));
 
-	// Get a pos just to check
-	int x=2000,y=1500;
-	int pos=y*imgSize[1]+x;
-
 	// Alloc buffer fits
 	void *data=NULL;
 	size_t sData=0;
@@ -129,10 +133,9 @@ int main(int argc, char * argv[]){
 	void *dData;
 	cudaMalloc((void **)&dData, sData);
 
-	for (int i=itStart; i<argc; i++) {
+	for (int i=arguments.itStart; i<argc; i++) {
 		printf("Fits: %s\n",argv[i]);
 		status=readFits(argv[i],data, imgSize,&min,&max);
-		//        printf("data[%i,%i]=%f\n",y,x,((double *)data)[pos]);
 		printf("data[min,max]=[%lf,%lf]\n",dmin,dmax);
 
 		// copy data to device

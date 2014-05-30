@@ -157,7 +157,6 @@ void rescaleRGBToYUV(AVFrame *framergb, AVFrame *frameyuv, uint8_t *buffrgb, uin
     
 	swsCtx = sws_getContext(framergb->width,framergb->height,AV_PIX_FMT_RGB24,frameyuv->width,frameyuv->height, AV_PIX_FMT_YUV420P, SWS_BILINEAR, 0,0,0);
 	ret = sws_scale(swsCtx,framergb->data, framergb->linesize,0, framergb->height,frameyuv->data, frameyuv->linesize);
-	printf("Image rescaled: %i\n",ret);
 	sws_freeContext(swsCtx);
 }
 void rescaleYUV(AVFrame *frameyuv0, AVFrame *frameyuv1, uint8_t *buffrgb0, uint8_t *buffyuv1, size_t sizeB1){
@@ -166,7 +165,6 @@ void rescaleYUV(AVFrame *frameyuv0, AVFrame *frameyuv1, uint8_t *buffrgb0, uint8
 
 	swsCtx = sws_getContext(frameyuv0->width,frameyuv0->height,AV_PIX_FMT_YUV420P,frameyuv1->width,frameyuv1->height, AV_PIX_FMT_YUV420P, SWS_BILINEAR, 0,0,0);
 	ret = sws_scale(swsCtx,frameyuv0->data, frameyuv0->linesize,0, frameyuv0->height,frameyuv1->data, frameyuv1->linesize);
-	printf("Image rescaled: %i\n",ret);
 	sws_freeContext(swsCtx);
 }
 void encodeOneFrameYUV(AVFormatContext *oc,AVStream *st,AVFrame *frmyuv, int i){
