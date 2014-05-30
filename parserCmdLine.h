@@ -37,9 +37,9 @@ static char args_doc[]="Output.mkv *.fits";
 
 /* Programme option */
 static struct argp_option options[]={
-		{"scale",'d',"dmin:dmax",OPTION_ARG_OPTIONAL,"Data value for data scaling"},
+		{"scale",'d',"dmin:dmax",0,"Data value for data scaling"},
 		{"size",'s',"nx:ny",OPTION_ARG_OPTIONAL,"resize YUV image to used Defined"},
-		{"fps",'f',"fps",OPTION_ARG_OPTIONAL,"User defined fps (Frame per second"},
+		{"fps",'f',"FPS",OPTION_ARG_OPTIONAL,"User defined fps (Frame per second"},
 		{0}
 };
 

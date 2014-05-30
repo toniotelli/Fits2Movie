@@ -40,23 +40,27 @@ int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments
 
 #else
 error_t parse_opt (int key, char *arg, struct argp_state *state){
+	char *ext=(char *)malloc(6);
 	struct arguments *arguments=state->input;
-
 	switch(key){
 	case 'd':
+		printf("arg=%s\n",arg);
 		sscanf(arg,"=%lf:%lf",&(arguments->dMinMax[0]),&(arguments->dMinMax[1]));
 		break;
 	case 's':
+		printf("arg=%s\n",arg);
 		arguments->scale=1;
 		sscanf(arg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
 		break;
 	case 'f':
-		arguments->fps=atoi(arg);
+		printf("arg=%s\n",arg);
+		sscanf(arg,"=%i",&(arguments->fps));
 		break;
 	case ARGP_KEY_ARG:
-		arguments->output=arg;
-		arguments->itStart=state->next;
-		state->next=state->argc;
+		printf("arg=%s\n",arg);
+			arguments->output=arg;
+			arguments->itStart=state->next;
+			state->next=state->argc;
 		break;
 	case ARGP_KEY_NO_ARGS:
 		argp_usage(state);
