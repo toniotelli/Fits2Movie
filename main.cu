@@ -69,9 +69,10 @@ int main(int argc, char * argv[]){
 	int status=0;
 	int imgSize[]={0,0,0};
 	int min=0,max=0;
+	int wave = 0;
 
 	// Get image dimension
-	status=getImageSize(argv[arguments.itStart],imgSize,&min,&max);
+	status=getImageSize(argv[arguments.itStart],imgSize,&min,&max,&wave);
 	if (status != 0) {
 		fits_report_error(stderr,status);
 		exit(-1);
@@ -143,7 +144,7 @@ int main(int argc, char * argv[]){
 		check_CUDA_error("Copying H to D");
 
 		// launch the process
-		launchConvertion(dbRGB, dData, imgSize[0], imgSize[1], imgSize[2], dmin, dmax);
+		launchConvertion(dbRGB, dData, imgSize[0], imgSize[1], imgSize[2], dmin, dmax, wave);
 
 		// copy back buffRGB to host
 		cudaMemcpy(hbRGB,dbRGB,bRGB,cudaMemcpyDeviceToHost);

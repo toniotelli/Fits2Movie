@@ -22,7 +22,7 @@ size_t allocDataType(void **data,int datatype,int nx, int ny){
 	*data=malloc(sizeData);
 	return sizeData;
 }
-int getImageSize(const char *filename,int *imgS, int *min, int *max){
+int getImageSize(const char *filename,int *imgS, int *min, int *max,int *wave){
 	fitsfile *fts;
 	int status=0;
 
@@ -43,6 +43,9 @@ int getImageSize(const char *filename,int *imgS, int *min, int *max){
 	fits_read_key(fts,TINT,"DATAMAX",(void *)max,NULL,&status);
 	*min=*min-1;
 	*max=*max+1;
+
+	// Read the wavelenght
+	fits_read_key(fts,TINT,"WAVELNTH",wave,NULL,&status);
 
 	// close the file
 	fits_close_file(fts,&status);
