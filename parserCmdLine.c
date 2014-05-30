@@ -10,32 +10,64 @@
 #ifdef __APPLE__
 
 int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments){
+	int status = 0;
+	char *ext=(char *)malloc(6);
 	int c=0;
-	opterr = 0;
-	while ((c=getopt(argc,argv,"d:s::")) != -1)
+	while (c != -1) {
+		c=getopt(argc,argv,"d:s::f::");
 		switch(c){
 		case 'd':
-			printf("option d: %s ",optarg);
-			sscanf(optarg,"=%lf:%lf",&(arguments->dMinMax[0]),&(arguments->dMinMax[1]));
-			printf("dmin=%lf, dmax= %lf\n",arguments->dMinMax[0],arguments->dMinMax[1]);
+			sscanf(optarg,"%lf:%lf",&(arguments->dMinMax[0]),&(arguments->dMinMax[1]));
 			break;
 		case 's':
 			arguments->scale=1;
-			sscanf(optarg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
+			sscanf(optarg,"%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
 			break;
 		case 'f':
-			arguments->fps=atoi(optarg);
+			sscanf(optarg,"%i",&(arguments->fps));
+			c=-1;
 			break;
 		case '?':
-			if (optopt == 'd') fprintf(stderr,"Option %c requires an arguments.\n",optopt);
+			if (argc == 1) {
+				status=-1;
+				printf("Usage: %s [-d] [min:max] [-s] [nx:ny] [-f] [fps] filename.mkv *.fits\n",argv[0]);
+			} else if (optopt == 'd' || optopt == 's' || optopt == 'f'){
+				fprintf(stderr,"Option %c requires an arguments.\n",optopt);
+				status=-1;
+			} else if (isprint(optopt)){
+				fprintf(stderr,"Unknown options -%c.\n",optopt);
+				status=-1;
+			} else {
+				fprintf(stderr,"Unknown option Character '\\x%x'.\n",optopt);
+				status=-1;
+			}
 			return 1;
 		default:
 			abort();
 		}
+	}
 
-	arguments->output=argv[optind];
-	arguments->itStart=optind+1;
-	return 0;
+	if (c == -1 && status != -1) {
+		int count = 0;
+		for (int ind = optind; ind < argc; ind++){
+			if (strlen(argv[ind]) > 6){
+				strncpy(ext,argv[ind]+strlen(argv[ind])-5,strlen(argv[ind]));
+				if ((strcmp(ext,".fits") != 0 )){
+					if (*(argv[ind]) != '-'){
+						arguments->output=argv[ind];
+					}
+				} else if (count == 0){
+					arguments->itStart=ind;
+					count++;
+				}
+			}
+		}
+		free(ext);
+		return 0;
+	}else {
+		free(ext);
+		return c;
+	}
 }
 
 #else
@@ -49,9 +81,6 @@ error_t parse_opt (int key, char *arg, struct argp_state *state){
 	case 's':
 		arguments->scale=1;
 		sscanf(arg,"=%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
-		break;
-	case 'f':
-		arguments->fps=atoi(arg);
 		break;
 	case ARGP_KEY_ARG:
 		arguments->output=arg;

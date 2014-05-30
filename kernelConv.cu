@@ -4,7 +4,7 @@
 __global__ void convert_fits_RGB_double_171(uint8_t *buff, double *data, int nx, int ny, double minD, double maxD){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int CC=y*nx+x;
+	int CC=(ny-y-1)*nx+x;
 	double temp=0;
 //	printf("data[%i]=%f\n",CC,data[CC]);
 
@@ -25,7 +25,7 @@ __global__ void convert_fits_RGB_double_171(uint8_t *buff, double *data, int nx,
 __global__ void convert_fits_RGB_float_171(uint8_t *buff, float *data, int nx, int ny, float minD, float maxD){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int CC=y*nx+x;
+	int CC=(ny-y-1)*nx+x;
 	double temp=0;
 //	printf("data[%i]=%f\n",CC,data[CC]);
 
@@ -35,7 +35,7 @@ __global__ void convert_fits_RGB_float_171(uint8_t *buff, float *data, int nx, i
 		} else if (data[CC] > maxD){
 			temp =255;
 		} else {
-			temp = (data[CC]-minD)/(maxD-minD)*255;
+			temp = (data[CC]-minD)/(float)(maxD-minD)*255;
 		}
 		// attempt to emule loadct data
 		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
@@ -46,7 +46,7 @@ __global__ void convert_fits_RGB_float_171(uint8_t *buff, float *data, int nx, i
 __global__ void convert_fits_RGB_long_171(uint8_t *buff, long *data, int nx, int ny, long minD, long maxD){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int CC=y*nx+x;
+	int CC=(ny-y-1)*nx+x;
 	double temp=0;
 //	printf("data[%i]=%f\n",CC,data[CC]);
 
@@ -56,7 +56,7 @@ __global__ void convert_fits_RGB_long_171(uint8_t *buff, long *data, int nx, int
 		} else if (data[CC] > maxD){
 			temp =255;
 		} else {
-			temp = (data[CC]-minD)/(maxD-minD)*255;
+			temp = (data[CC]-minD)/(float)(maxD-minD)*255;
 		}
 		// attempt to emule loadct data
 		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
@@ -67,7 +67,7 @@ __global__ void convert_fits_RGB_long_171(uint8_t *buff, long *data, int nx, int
 __global__ void convert_fits_RGB_shortInt_171(uint8_t *buff, short int *data, int nx, int ny, short int minD, short int maxD){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int CC=y*nx+x;
+	int CC=(ny-y-1)*nx+x;
 	double temp=0;
 //	printf("data[%i]=%f\n",CC,data[CC]);
 
@@ -77,7 +77,7 @@ __global__ void convert_fits_RGB_shortInt_171(uint8_t *buff, short int *data, in
 		} else if (data[CC] > maxD){
 			temp =255;
 		} else {
-			temp = (data[CC]-minD)/(maxD-minD)*255;
+			temp = (data[CC]-minD)/(float)(maxD-minD)*255;
 		}
 		// attempt to emule loadct data
 		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);
@@ -88,7 +88,7 @@ __global__ void convert_fits_RGB_shortInt_171(uint8_t *buff, short int *data, in
 __global__ void convert_fits_RGB_uchar_171(uint8_t *buff, unsigned char *data, int nx, int ny, unsigned char minD, unsigned char maxD){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int CC=y*nx+x;
+	int CC=(ny-y-1)*nx+x;
 	double temp=0;
 //	printf("data[%i]=%f\n",CC,data[CC]);
 
@@ -98,7 +98,7 @@ __global__ void convert_fits_RGB_uchar_171(uint8_t *buff, unsigned char *data, i
 		} else if (data[CC] > maxD){
 			temp =255;
 		} else {
-			temp = (data[CC]-minD)/(maxD-minD)*255;
+			temp = (data[CC]-minD)/(float)(maxD-minD)*255;
 		}
 		// attempt to emule loadct data
 		buff[3*CC]=(uint8_t)((1.44068*temp > 255) ? 255 : 1.44068*temp);

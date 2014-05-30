@@ -114,6 +114,7 @@ build: $(project_name)
 
 $(project_name): $(OBJS)
 	$(NVCC) $(NVCCFLAGS) -o $@ $(OBJS) $(LDFLAGS) $(EXTRA_LDFLAGS)
+	cp $@ test
 
 run:
 	./$(project_name)
