@@ -28,15 +28,40 @@ __global__ void convert_fits_RGB_double(uint8_t *buff, double *data, int wave, i
 			temp = (data[CC]-minD)/(maxD-minD)*255;
 		}
 		switch(wave){
+		case 94:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)c3(temp);
+			buff[3*CCOk+2]=(uint8_t)temp;
+			break;
+		case 131:
+			buff[3*CCOk]=(uint8_t)g0(temp,120);
+			buff[3*CCOk+1]=(uint8_t)r0(temp,255);
+			buff[3*CCOk+2]=(uint8_t)r0(temp,255);
+			break;
 		case 171:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)(temp);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
 			break;
+		case 193:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
+		case 211:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
 		case 304:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)g0(temp,120);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
+			break;
+		case 355:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)(temp);
+			buff[3*CCOk+2]=(uint8_t)c1(temp);
 			break;
 		}
 	}
@@ -58,15 +83,40 @@ __global__ void convert_fits_RGB_float(uint8_t *buff, float *data, int wave, int
 			temp = (data[CC]-minD)/(double)(maxD-minD)*255;
 		}
 		switch(wave){
+		case 94:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)c3(temp);
+			buff[3*CCOk+2]=(uint8_t)temp;
+			break;
+		case 131:
+			buff[3*CCOk]=(uint8_t)g0(temp,120);
+			buff[3*CCOk+1]=(uint8_t)r0(temp,255);
+			buff[3*CCOk+2]=(uint8_t)r0(temp,255);
+			break;
 		case 171:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)(temp);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
 			break;
+		case 193:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
+		case 211:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
 		case 304:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)g0(temp,120);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
+			break;
+		case 355:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)(temp);
+			buff[3*CCOk+2]=(uint8_t)c1(temp);
 			break;
 		}
 	}
@@ -88,15 +138,40 @@ __global__ void convert_fits_RGB_long(uint8_t *buff, long *data, int wave, int n
 			temp = (data[CC]-minD)/(double)(maxD-minD)*255;
 		}
 		switch(wave){
+		case 94:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)c3(temp);
+			buff[3*CCOk+2]=(uint8_t)temp;
+			break;
+		case 131:
+			buff[3*CCOk]=(uint8_t)g0(temp,120);
+			buff[3*CCOk+1]=(uint8_t)r0(temp,255);
+			buff[3*CCOk+2]=(uint8_t)r0(temp,255);
+			break;
 		case 171:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)(temp);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
 			break;
+		case 193:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
+		case 211:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
 		case 304:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)g0(temp,120);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
+			break;
+		case 355:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)(temp);
+			buff[3*CCOk+2]=(uint8_t)c1(temp);
 			break;
 		}
 	}
@@ -118,15 +193,40 @@ __global__ void convert_fits_RGB_shortInt(uint8_t *buff, short int *data, int wa
 			temp = (data[CC]-minD)/(double)(maxD-minD)*255;
 		}
 		switch(wave){
+		case 94:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)c3(temp);
+			buff[3*CCOk+2]=(uint8_t)temp;
+			break;
+		case 131:
+			buff[3*CCOk]=(uint8_t)g0(temp,120);
+			buff[3*CCOk+1]=(uint8_t)r0(temp,255);
+			buff[3*CCOk+2]=(uint8_t)r0(temp,255);
+			break;
 		case 171:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)(temp);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
 			break;
+		case 193:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
+		case 211:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
 		case 304:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)g0(temp,120);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
+			break;
+		case 355:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)(temp);
+			buff[3*CCOk+2]=(uint8_t)c1(temp);
 			break;
 		}
 	}
@@ -148,15 +248,40 @@ __global__ void convert_fits_RGB_uchar(uint8_t *buff, unsigned char *data, int w
 			temp = (data[CC]-minD)/(double)(maxD-minD)*255;
 		}
 		switch(wave){
+		case 94:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)c3(temp);
+			buff[3*CCOk+2]=(uint8_t)temp;
+			break;
+		case 131:
+			buff[3*CCOk]=(uint8_t)g0(temp,120);
+			buff[3*CCOk+1]=(uint8_t)r0(temp,255);
+			buff[3*CCOk+2]=(uint8_t)r0(temp,255);
+			break;
 		case 171:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)(temp);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
 			break;
+		case 193:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
+		case 211:
+			buff[3*CCOk]=(uint8_t)c1(temp);
+			buff[3*CCOk+1]=(uint8_t)temp;
+			buff[3*CCOk+2]=(uint8_t)c2(temp);
+			break;
 		case 304:
 			buff[3*CCOk]=(uint8_t)r0(temp,255);
 			buff[3*CCOk+1]=(uint8_t)g0(temp,120);
 			buff[3*CCOk+2]=(uint8_t)b0(temp,190);
+			break;
+		case 355:
+			buff[3*CCOk]=(uint8_t)c2(temp);
+			buff[3*CCOk+1]=(uint8_t)(temp);
+			buff[3*CCOk+2]=(uint8_t)c1(temp);
 			break;
 		}
 	}
