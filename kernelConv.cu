@@ -1,7 +1,7 @@
 #include "kernelConv.cuh"
 
 // Inline functions in double
-// Red Temperature
+// Red Temperature (ind = r 255, g 120, b 190
 __device__ inline double r0(double temp, int ind){ return ((1.44068*temp > ind) ? 255 : 1.44068*temp);}
 __device__ inline double g0(double temp, int ind){ return ((temp <= ind) ? 0 : 1.88889*temp);}
 __device__ inline double b0(double temp, int ind){ return ((temp <= ind) ? 0 : 3.92308*temp);}
