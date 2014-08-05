@@ -42,8 +42,13 @@ else
 endif
 
 # Common binaries
-GCC             ?= clang
-NVCC            ?= $(CUDA_BIN_PATH)/nvcc -ccbin $(GCC)
+ifneq ($(DARWIN),)
+	GCC             ?= gcc
+	NVCC            ?= $(CUDA_BIN_PATH)/nvcc
+else
+	GCC             ?= clang
+	NVCC            ?= $(CUDA_BIN_PATH)/nvcc -ccbin $(GCC)
+endif
 
 # Extra user flags
 EXTRA_NVCCFLAGS ?= 
@@ -53,7 +58,8 @@ EXTRA_CCFLAGS   ?=
 
 # CUDA code generation flags
 GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
-GENCODE_FLAGS   := $(GENCODE_SM10)
+GENCODE_SM35    := -gencode arch=compute_35,code=sm_35
+GENCODE_FLAGS   := $(GENCODE_SM10) $(GENCODE_SM35)
 
 # Define Include and library PATH
 PROJECT_PATH   = $(shell pwd)
@@ -92,6 +98,12 @@ else
 #      NVCCFLAGS += -lineinfo
       TARGET    := release
 
+endif
+
+# Test if build folder presenet
+ifneq ($(wildcard build),)
+	mkdir build
+	echo "create build dir"
 endif
 
 # Common includes and paths for CUDA
