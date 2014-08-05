@@ -1,4 +1,4 @@
-build/*
+build/*.o
 Fits2Movie
 *.txt
 ./.project

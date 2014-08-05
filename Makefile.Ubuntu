@@ -78,9 +78,9 @@ endif
 
 # OS-architecture specific flags
 ifeq ($(OS_SIZE),32)
-      NVCCFLAGS := -m32 $(CCFLAGS)
+      NVCCFLAGS := $(CCFLAGS)
 else
-      NVCCFLAGS := -m64 $(CCFLAGS)
+      NVCCFLAGS := $(CCFLAGS)
 endif
 
 # Debug build flags
@@ -91,7 +91,6 @@ ifeq ($(dbg),1)
 else
 #      NVCCFLAGS += -lineinfo
       TARGET    := release
-
 endif
 
 # Common includes and paths for CUDA

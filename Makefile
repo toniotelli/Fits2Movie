@@ -84,9 +84,9 @@ endif
 
 # OS-architecture specific flags
 ifeq ($(OS_SIZE),32)
-      NVCCFLAGS := -m32 $(CCFLAGS)
+      NVCCFLAGS := $(CCFLAGS)
 else
-      NVCCFLAGS := -m64 $(CCFLAGS)
+      NVCCFLAGS := $(CCFLAGS)
 endif
 
 # Debug build flags
@@ -100,11 +100,13 @@ else
 
 endif
 
-# Test if build folder presenet
-ifneq ($(wildcard build),)
-	mkdir build
-	echo "create build dir"
-endif
+# Test build dir
+# build_dir= $(shell if test -d build)
+# ifeq ($(build_dir),0) 
+# 	mkdir build
+# # else
+# # 	$(shell echo "build is present")
+# endif
 
 # Common includes and paths for CUDA
 INCLUDES      := -I$(CUDA_INC_PATH) -I. $(PROJ_INCLUDES)
