@@ -12,9 +12,6 @@
 #include <unistd.h>
 #include <fitsio.h>
 #include <stdint.h>
-#ifndef __APPLE__
-#include <argp.h>
-#endif
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
@@ -22,43 +19,51 @@
 #include "kernelConv.cuh"
 
 extern "C" {
-
-#ifndef __APPLE__
-// Argp
-const char *argp_program_version ="Fits2Movie 0.1";
-const char *argp_program_bug_address ="<antoine.genetelli@mac.com>";
-#endif
-
 #include "aviFunction.h"
 #include "fitsFunction.h"
 #include "parserCmdLine.h"
 }
 
 int main(int argc, char * argv[]){
-	printf("Welcome to %s!\n",argv[0]);
-	struct arguments arguments;
-	arguments.scale=0;
-	arguments.fps=30;
-	printf("FPS = %i\n",arguments.fps);
-	int error=0;
-#ifndef __APPLE__
-	error = argp_parse (&argp, argc, argv, 0, 0, &arguments);
-#else
-	error = parseCmdLine(argc,argv,optString,&arguments);
-#endif
-	printf("error = %i\n",error);
-	if (error != 0){
-		exit(-1);
+	double dmin=0.0,dmax=0.0;
+// printf("Welcome to %s!\n",argv[0]);
+
+	arguments arguments;
+	// Init default variables
+	arguments.hFlag=false;
+	arguments.scale=false;
+	arguments.resize=false;
+	arguments.fpsU=false;
+	arguments.dMinMax[0]=dmin;
+	arguments.dMinMax[1]=dmax;
+	arguments.fps=25;
+
+	
+	if (argc == 1) {
+		printUsage(argv[0]);
+		return 1;
+	} else {
+	int error = parseCmdLine(argc,argv,optString,&arguments);
+		if (error != 0){
+			return 1;
+		}
+
+		// if (!arguments.fpsU){
+		// 	arguments.fps=25;
+		// }
+		// if (arguments.scale){
+		// 	dmin=arguments.dMinMax[0];
+		// 	dmax=arguments.dMinMax[1];
+		// } else {
+		// 	arguments.dMinMax[0]=0.0;
+		// 	arguments.dMinMax[1]=0.0;
+		// }
 	}
+
 	printf("Number of files = %i\n",argc);
 	printf("Save movie in : %s\n",arguments.output);
 	printf("First fit files = %s\n",argv[arguments.itStart]);
 	printf("FPS = %i\n",arguments.fps);
-
-	double dmin=arguments.dMinMax[0];
-	double dmax=arguments.dMinMax[1];
-
-	printf("Scaling parameters : %lf,%lf",dmin,dmax);
 
 	// Cuda
 	int nbCuda=0;
@@ -91,14 +96,14 @@ int main(int argc, char * argv[]){
 	size_t bRGB=3*imgSize[1]*imgSize[2]*sizeof(uint8_t);
 	size_t bYUV=2*imgSize[1]*imgSize[2]*sizeof(uint8_t);
 	size_t bYUVConv=0;
-	if (arguments.scale == 1) {
+	if (arguments.resize == 1) {
 		bYUVConv=bYUV;
 		bYUV=2*arguments.NXNY[0]*arguments.NXNY[1]*sizeof(uint8_t);
 	}
 	uint8_t *hbRGB,*hbYUV,*hbYUVConv;
 	hbRGB=(uint8_t *)malloc(bRGB);
 	hbYUV=(uint8_t *)malloc(bYUV);
-	if (arguments.scale == 1){
+	if (arguments.resize == 1){
 		hbYUVConv = (uint8_t *)malloc(bYUVConv);
 	}
 
@@ -137,11 +142,20 @@ int main(int argc, char * argv[]){
 	for (int i=arguments.itStart; i<argc; i++) {
 		printf("Fits: %s\n",argv[i]);
 		status=readFits(argv[i],data, imgSize,&min,&max);
-		printf("data[min,max]=[%lf,%lf]\n",dmin,dmax);
 
 		// copy data to device
 		cudaMemcpy(dData, data, sData, cudaMemcpyHostToDevice);
 		check_CUDA_error("Copying H to D");
+
+		if (!arguments.scale){
+			dmin=min;
+			dmax=max;
+		} else {
+			dmin=arguments.dMinMax[0];
+			dmin=arguments.dMinMax[1];
+		}
+		printf("data[min,max]=[%lf,%lf]\n",dmin,dmax);
+
 
 		// launch the process
 		launchConvertion(dbRGB, dData, imgSize[0], imgSize[1], imgSize[2], dmin, dmax, wave);
@@ -162,7 +176,7 @@ int main(int argc, char * argv[]){
 	cudaFree(dbRGB);
 	cudaFree(dData);
 	free(data);
-
+	
 	// dealloc movie files
 	av_write_trailer(oc);
 	avcodec_close(avStream->codec);
@@ -170,6 +184,8 @@ int main(int argc, char * argv[]){
 	avio_close(oc->pb);
 	deallocFrames(frameRGB, frameYUV, hbRGB, hbYUV);
 	if (arguments.scale == 1) deallocFrameConversion(frameYUVConv,hbYUVConv);
+
+	cudaDeviceReset();
 
 	return 0;
 }

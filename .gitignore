@@ -1,1 +1,6 @@
-*.o
+build/*
+Fits2Movie
+*.txt
+./.project
+./.cproject
+*.mkv

@@ -58,7 +58,7 @@ GENCODE_FLAGS   := $(GENCODE_SM10)
 # Define Include and library PATH
 PROJECT_PATH   = $(shell pwd)
 
-PROJ_INCLUDES := -I/usr/local/cfitsio/include -I/usr/local/include
+PROJ_INCLUDES := -I/usr/local/cfitsio/include -I/usr/local/include -Isrc
 PROJ_LIB      := -L. -L/usr/local/cfitsio/lib -L/usr/local/lib
 
 
@@ -98,29 +98,28 @@ endif
 INCLUDES      := -I$(CUDA_INC_PATH) -I. $(PROJ_INCLUDES)
 
 # Source and object
-SRCS := main.c parserCmdLine.c aviFunction.c fitsFunction.c kernelConv.cu
-OBJS := main.o parserCmdLine.c aviFunction.o fitsFunction.o kernelConv.o
+SRCS := src/main.cu src/parserCmdLine.c src/aviFunction.c src/fitsFunction.c src/kernelConv.cu
+OBJS := build/main.o build/parserCmdLine.o build/aviFunction.o build/fitsFunction.o build/kernelConv.o
 
 # Target rules
 all: $(project_name)
 
 build: $(project_name)
 
-%.o : %.cu
+build/%.o : src/%.cu
 	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
 
-%.o : %.c
+build/%.o : src/%.c
 	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
 
 $(project_name): $(OBJS)
 	$(NVCC) $(NVCCFLAGS) -o $@ $(OBJS) $(LDFLAGS) $(EXTRA_LDFLAGS)
-	cp $@ test
 
 run:
 	./$(project_name)
 
 clean:
-	rm -f $(project_name) *.o *.cuo
+	rm -f $(project_name) build/*
     
 printObjs: 
 	echo $(OBJS)
