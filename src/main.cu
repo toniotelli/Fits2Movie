@@ -152,7 +152,7 @@ int main(int argc, char * argv[]){
 			dmax=max;
 		} else {
 			dmin=arguments.dMinMax[0];
-			dmin=arguments.dMinMax[1];
+			dmax=arguments.dMinMax[1];
 		}
 		printf("data[min,max]=[%lf,%lf]\n",dmin,dmax);
 
