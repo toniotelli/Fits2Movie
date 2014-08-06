@@ -4,3 +4,5 @@ Fits2Movie
 ./.project
 ./.cproject
 *.mkv
+.AppleDouble
+*/.AppleDouble

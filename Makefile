@@ -43,11 +43,11 @@ endif
 
 # Common binaries
 ifneq ($(DARWIN),)
-	GCC             ?= gcc
-	NVCC            ?= $(CUDA_BIN_PATH)/nvcc
-else
 	GCC             ?= clang
 	NVCC            ?= $(CUDA_BIN_PATH)/nvcc -ccbin $(GCC)
+else
+	GCC             ?= g++
+	NVCC            ?= $(CUDA_BIN_PATH)/nvcc 
 endif
 
 # Extra user flags
@@ -78,7 +78,7 @@ else
       CCFLAGS   := -m32
   else
       LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
-      CCFLAGS   := -m64
+      CCFLAGS   := -m64 
   endif
 endif
 
@@ -116,7 +116,7 @@ SRCS := src/main.cu src/parserCmdLine.c src/aviFunction.c src/fitsFunction.c src
 OBJS := build/main.o build/parserCmdLine.o build/aviFunction.o build/fitsFunction.o build/kernelConv.o
 
 # Target rules
-all: $(project_name)
+all: build
 
 build: $(project_name)
 

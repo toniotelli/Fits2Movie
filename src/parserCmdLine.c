@@ -70,7 +70,8 @@ int parseCmdLine(int argc, char *argv[], const char *optString, arguments *argum
 
 	if (c == -1) {
 		int count = 0;
-		for (int ind = optind; ind < argc; ind++){
+		int ind =0;
+		for (ind = optind; ind < argc; ind++){
 			if (strlen(argv[ind]) > 6){
 				strncpy(ext,argv[ind]+strlen(argv[ind])-5,strlen(argv[ind]));
 				if ((strcmp(ext,".fits") != 0 )){

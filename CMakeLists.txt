@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 PROJECT(Fits2Movie)
 
 
-set(source_dir ${CMAKE_CURRENT_SOURCE_DIR})
+set(source_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(binary_dir ${CMAKE_CURRENT_BINARY_DIR})
 
 set(BUILD_SHARED_LIBS ON)
@@ -84,8 +84,8 @@ set(CUDA_NVCC_FLAGS ${custom_cuda_flags})
 # Message
 message("avcodec: ${AVCODEC_LIBRARIES}")
 
-add_library(parserlib STATIC parserCmdLine.c parserCmdLine.h fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)
-CUDA_ADD_EXECUTABLE(Fits2Movies main.cu kernelConv.cu kernelConv.cuh)
+add_library(parserlib SHARED src/parserCmdLine.c src/parserCmdLine.h src/fitsFunction.c src/aviFunction.c src/fitsFunction.h src/aviFunction.h)
+CUDA_ADD_EXECUTABLE(Fits2Movies src/main.cu src/kernelConv.cu src/kernelConv.cuh)
 TARGET_LINK_LIBRARIES(Fits2Movies parserlib ${libsCuda} ${CFITSIO_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
 
 #CUDA_ADD_EXECUTABLE(Fits2Movies main.cu)# kernelConv.cu kernelConv.cuh)# fitsFunction.c aviFunction.c fitsFunction.h aviFunction.h)

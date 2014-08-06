@@ -19,9 +19,9 @@
 #include "kernelConv.cuh"
 
 extern "C" {
-#include "aviFunction.h"
-#include "fitsFunction.h"
 #include "parserCmdLine.h"
+#include "fitsFunction.h"
+#include "aviFunction.h"
 }
 
 int main(int argc, char * argv[]){
