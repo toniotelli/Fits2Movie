@@ -38,12 +38,12 @@ void printHead(char *message, int nx){
 	printf("/\033[0m\n");
 }
 void printProgress(int it, int itmax, int nx){
-	char start[10],end[11];
+	char start[15],end[11];
 	int indent, newNX, i;
 
 	// Compute percentage done:
 	float percPrg=it*100.0/(float)itmax;
-	sprintf(start,"It = %i/%i [",it,itmax);
+	sprintf(start,"It = %i [",it);
 	sprintf(end,"] %.3f%%",percPrg);
 	printf("%s",start);
 

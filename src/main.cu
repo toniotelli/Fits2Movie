@@ -80,7 +80,7 @@ int main(int argc, char * argv[]){
 	}
 
 	system("clear");
-	printf("\033[-1A");
+	printf("Terminal size = [%i,%i]",ws.ws_col,ws.ws_row);
 	printHead("Welcome to Fits2Movie!",ws.ws_col);
 	// printf("\033[34m\\********************** Welcome to %s! **********************/\033[0m\n",argv[0]);
 	printf("Number of files = \033[32m%i\033[0m\n",argc);
@@ -191,7 +191,6 @@ int main(int argc, char * argv[]){
 		}
 		printf("User[min,max]=[%lf,%lf]\n",dmin,dmax);
 
-
 		// launch the process
 		launchConvertion(dbRGB, dData, imgSize[0], imgSize[1], imgSize[2], dmin, dmax, wave);
 
@@ -207,13 +206,13 @@ int main(int argc, char * argv[]){
 			rescaleRGBToYUV(frameRGB,frameYUV,hbRGB,hbYUV,bRGB);
 		}
 		encodeOneFrameYUV(oc,avStream,frameYUV,i);
-
+		
+		// Progress and cpu ticks
 		printProgress(i, argc-1,ws.ws_col);
 		if (i < argc-1) printf("\033[4A");
 		ticks=clock();
 	}
-	// printProgress(i, argc-1,ws.ws_col);
-
+	
 	// Compute time elapse on initialization
 	time(&stop);
 	printf("Used %0.2f seconds of CPU time. \n", (double)ticks/CLOCKS_PER_SEC);
