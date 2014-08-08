@@ -292,8 +292,8 @@ void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, dou
 	dim3 dimB(BLOCKX,BLOCKY);
 	dim3 dimG(nx/BLOCKX,ny/BLOCKY);
 
-	printf("%i,%i\n",nx,ny);
-	printf("%i,%i\n",nx/32,ny/32);
+	// printf("%i,%i\n",nx,ny);
+	// printf("%i,%i\n",nx/32,ny/32);
 
 	// lauch kernel
 	switch(bitpix){
@@ -338,14 +338,14 @@ int checkCudaDevice(){
 	cudaDeviceReset();
 
 	cudaSetDeviceFlags(cudaDeviceMapHost);
-	printf("\nThere is %i CUDA Device using %i",NBCudaDev,devN);
+	printf("There is \033[32m%i\033[0m CUDA Device using %i",NBCudaDev,devN);
 	cudaDeviceProp dprop;
 	cudaGetDeviceProperties(&dprop, devN);
-	printf(" : %s\n", dprop.name);
+	printf(" : \033[34m%s\033[0m\n", dprop.name);
 	printf("Can Map host Mem : %i\n", dprop.canMapHostMemory);
 
 	// Show device properties
 	printf("Max Treads by block = %i.\n",dprop.maxThreadsPerBlock);
-	printf("Max Grid Size X = %i.\n\n",dprop.maxGridSize[1]);
+	printf("Max Grid Size X = %i.\n",dprop.maxGridSize[1]);
 	return NBCudaDev;
 }

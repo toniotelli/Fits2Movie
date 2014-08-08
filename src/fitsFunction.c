@@ -68,7 +68,7 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	fits_read_key(fts,TINT,"DATAMAX",(void *)max,NULL,&status);
 	*min=*min-1;
 	*max=*max+1;
-	printf("[min,max]=[%i,%i]\n",*min,*max);
+	printf("Data[min,max]=[%i,%i]\n",*min,*max);
 
 	// Data type
 	switch(imgS[0]) {

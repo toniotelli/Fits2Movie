@@ -9,12 +9,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <time.h>
+#include <math.h>
 #include <unistd.h>
 #include <fitsio.h>
 #include <stdint.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
+
 
 #include "kernelConv.cuh"
 
@@ -25,52 +30,76 @@ extern "C" {
 }
 
 int main(int argc, char * argv[]){
-	double dmin=0.0,dmax=0.0;
-// printf("Welcome to %s!\n",argv[0]);
+	// get terminal size
+	struct winsize ws;
+   	ioctl(0, TIOCGWINSZ, &ws);
 
-	arguments arguments;
+	double dmin=0.0,dmax=0.0;
+	int error=0;
+
+	struct arguments arguments;
 	// Init default variables
 	arguments.hFlag=false;
 	arguments.scale=false;
 	arguments.resize=false;
 	arguments.fpsU=false;
-	arguments.dMinMax[0]=dmin;
-	arguments.dMinMax[1]=dmax;
-	arguments.fps=25;
 
-	
+	// Time For benchMark
+	time_t start,stop;
+	clock_t ticks;
+
+	// Start the event record
+	time(&start);
+
+	// arguments.dMin=dmin;
+	// arguments.dMax=dmax;
+	// arguments.NXNY[0]=0;
+	// arguments.NXNY[1]=0;
+	// arguments.fps=25;
+
 	if (argc == 1) {
 		printUsage(argv[0]);
 		return 1;
 	} else {
-	int error = parseCmdLine(argc,argv,optString,&arguments);
+	error = parseCmdLine(argc,argv,optString,&arguments);
 		if (error != 0){
+			printUsage(argv[0]);
 			return 1;
 		}
-
-		// if (!arguments.fpsU){
-		// 	arguments.fps=25;
-		// }
-		// if (arguments.scale){
-		// 	dmin=arguments.dMinMax[0];
-		// 	dmax=arguments.dMinMax[1];
-		// } else {
-		// 	arguments.dMinMax[0]=0.0;
-		// 	arguments.dMinMax[1]=0.0;
-		// }
+		printf("arg of optind = %s\n",argv[arguments.argInd]);
+		if (!arguments.fpsU){
+			arguments.fps=25;
+		}
+		if (arguments.scale){
+			dmin=arguments.dMin;
+			dmax=arguments.dMax;
+		} else {
+			arguments.dMin=0;
+			arguments.dMax=0;
+		}
 	}
 
-	printf("Number of files = %i\n",argc);
-	printf("Save movie in : %s\n",arguments.output);
-	printf("First fit files = %s\n",argv[arguments.itStart]);
-	printf("FPS = %i\n",arguments.fps);
+	system("clear");
+	printf("\033[-1A");
+	printHead("Welcome to Fits2Movie!",ws.ws_col);
+	// printf("\033[34m\\********************** Welcome to %s! **********************/\033[0m\n",argv[0]);
+	printf("Number of files = \033[32m%i\033[0m\n",argc);
+	printf("Save movie in : \033[32m%s\033[0m\n",arguments.output);
+	printf("First fit files = \033[32m%s\033[0m\n",argv[arguments.itStart]);
+	printf("FPS = \033[32m%i\033[0m\n",arguments.fps);
+	if (arguments.scale) printf("Scale = \033[32m%lf,%lf\033[0m\n",arguments.dMin,arguments.dMax);
+	if (arguments.resize) printf("Resize = \033[32m%i,%i\033[0m\n",arguments.NX,arguments.NY);
 
 	// Cuda
+	printHead("CUDA Capabilities",ws.ws_col);
+	// printf("\033[34m\\********************** CUDA Capabilities **********************/\033[0m\n");
 	int nbCuda=0;
 	nbCuda=checkCudaDevice();
-	printf("There is %i devices\n",nbCuda);
+	nbCuda+=1; // Just to remove warning
 
 	// Fits Variables
+	printHead("Fits Parameters",ws.ws_col);	
+	// printf("\033[34m\\********************** Fits Parameters **********************/\033[0m\n");
 	int status=0;
 	int imgSize[]={0,0,0};
 	int min=0,max=0;
@@ -82,50 +111,53 @@ int main(int argc, char * argv[]){
 		fits_report_error(stderr,status);
 		exit(-1);
 	}
+	printf("BITPIX = %i\n",imgSize[0]);
+	printf("Image Size = [%i,%i]\n", imgSize[1],imgSize[2]);
+	printf("Wavelenght = %i Angstrom\n",wave);
 
 	// AVCodec variable
-	printf("AV struct \n");
+	printHead("FFMpeg",ws.ws_col);
+	// printf("\n\033[34m\\********************** AVCodec **********************/\033[0m\n");
 	struct AVFormatContext *oc;
 	struct AVCodec *avCodec;
 	struct AVStream *avStream;
 	struct AVFrame *frameRGB,*frameYUV;
 	struct AVFrame *frameYUVConv;
 
-
 	// Alloc the frameBuffer for encoding
 	size_t bRGB=3*imgSize[1]*imgSize[2]*sizeof(uint8_t);
 	size_t bYUV=2*imgSize[1]*imgSize[2]*sizeof(uint8_t);
 	size_t bYUVConv=0;
-	if (arguments.resize == 1) {
+	if (arguments.resize) {
 		bYUVConv=bYUV;
-		bYUV=2*arguments.NXNY[0]*arguments.NXNY[1]*sizeof(uint8_t);
+		bYUV=2*arguments.NX*arguments.NY*sizeof(uint8_t);
 	}
 	uint8_t *hbRGB,*hbYUV,*hbYUVConv;
 	hbRGB=(uint8_t *)malloc(bRGB);
 	hbYUV=(uint8_t *)malloc(bYUV);
-	if (arguments.resize == 1){
+	if (arguments.resize){
 		hbYUVConv = (uint8_t *)malloc(bYUVConv);
 	}
 
 	// Init avcodec
 	av_register_all();
-	av_log_set_level(AV_LOG_INFO);
+	av_log_set_level(AV_LOG_ERROR);
 
 	// Open Movie file and alloc necessary stuff
 	remove(arguments.output);
 	openFormat(arguments.output, &oc);
-	if (arguments.scale == 1){
-		openStream(oc, &avCodec, &avStream, arguments.NXNY[0], arguments.NXNY[1], arguments.fps);
+	if (arguments.resize){
+		openStream(oc, &avCodec, &avStream, arguments.NX, arguments.NY, arguments.fps);
 		openCodec(&avCodec, avStream);
 		allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV, imgSize[1], imgSize[2]);
-		allocFrameConversion(&frameYUVConv,hbYUVConv,arguments.NXNY[0],arguments.NXNY[1]);
+		allocFrameConversion(&frameYUVConv,hbYUVConv,arguments.NX,arguments.NY);
 	} else {
 		openStream(oc, &avCodec, &avStream, imgSize[1], imgSize[2], arguments.fps);
 		openCodec(&avCodec, avStream);
 		allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV, imgSize[1], imgSize[2]);
 	}
 	writeHeader(arguments.output, oc);
-	printf("Using %s: %s\nCodec: %s\n",oc->oformat->name,oc->oformat->long_name,avcodec_get_name(oc->oformat->video_codec));
+	// printf("Using %s: %s\nCodec: %s\n",oc->oformat->name,oc->oformat->long_name,avcodec_get_name(oc->oformat->video_codec));
 
 	// Alloc buffer fits
 	void *data=NULL;
@@ -139,6 +171,9 @@ int main(int argc, char * argv[]){
 	void *dData;
 	cudaMalloc((void **)&dData, sData);
 
+	// Run loop
+	printHead("Converting",ws.ws_col);
+	// printf("\n\033[34m\\********************** Converting **********************/\033[0m\n");
 	for (int i=arguments.itStart; i<argc; i++) {
 		printf("Fits: %s\n",argv[i]);
 		status=readFits(argv[i],data, imgSize,&min,&max);
@@ -151,10 +186,10 @@ int main(int argc, char * argv[]){
 			dmin=min;
 			dmax=max;
 		} else {
-			dmin=arguments.dMinMax[0];
-			dmax=arguments.dMinMax[1];
+			dmin=arguments.dMin;
+			dmax=arguments.dMax;
 		}
-		printf("data[min,max]=[%lf,%lf]\n",dmin,dmax);
+		printf("User[min,max]=[%lf,%lf]\n",dmin,dmax);
 
 
 		// launch the process
@@ -165,14 +200,26 @@ int main(int argc, char * argv[]){
 		check_CUDA_error("Copying D to H");
 
 		// Rescale and encode frame
-		if (arguments.scale == 1){
+		if (arguments.resize){
 			rescaleRGBToYUV(frameRGB,frameYUVConv,hbRGB,hbYUVConv,bRGB);
 			rescaleYUV(frameYUVConv,frameYUV,hbYUVConv,hbYUV,bYUV);
 		} else {
 			rescaleRGBToYUV(frameRGB,frameYUV,hbRGB,hbYUV,bRGB);
 		}
 		encodeOneFrameYUV(oc,avStream,frameYUV,i);
+
+		printProgress(i, argc-1,ws.ws_col);
+		if (i < argc-1) printf("\033[4A");
+		ticks=clock();
 	}
+	// printProgress(i, argc-1,ws.ws_col);
+
+	// Compute time elapse on initialization
+	time(&stop);
+	printf("Used %0.2f seconds of CPU time. \n", (double)ticks/CLOCKS_PER_SEC);
+	printf("Time spent for %i fits of [%i,%i]: \033[31m%f [min]\033[0m\n",argc,imgSize[1],imgSize[2],difftime(stop,start)/60.0);
+	
+	// Free Graphic Memory
 	cudaFree(dbRGB);
 	cudaFree(dData);
 	free(data);
@@ -183,7 +230,7 @@ int main(int argc, char * argv[]){
 	av_free(avStream);
 	avio_close(oc->pb);
 	deallocFrames(frameRGB, frameYUV, hbRGB, hbYUV);
-	if (arguments.scale == 1) deallocFrameConversion(frameYUVConv,hbYUVConv);
+	if (arguments.resize) deallocFrameConversion(frameYUVConv,hbYUVConv);
 
 	cudaDeviceReset();
 

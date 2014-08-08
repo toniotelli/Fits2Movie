@@ -11,25 +11,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <ctype.h>
 
-typedef struct {
+struct arguments{
 	char *output;
 	bool hFlag;
 	bool resize;
 	bool scale;
 	bool fpsU;
 	int itStart;
-	double dMinMax[2];
-	int NXNY[2];
 	int fps;
-}arguments;
+	int NX;
+	int NY;
+	double dMin;
+	double dMax;
+	int argInd;
+};
 
 void printUsage(char *string);
 void printHelp(char *string);
-static const char optString[]="d:s::f::h";
-int parseCmdLine(int argc, char *argv[], const char *optString, arguments *arguments);
+void printHead(char *message, int nx);
+void printProgress(int it, int itmax, int nx);
+
+bool checkArg(const char *filename);
+
+const char optString[]="d:s:f:h";
+int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments);
 
 #endif /* PARSERCMDLINE_H_ */

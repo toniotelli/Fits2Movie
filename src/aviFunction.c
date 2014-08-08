@@ -39,7 +39,7 @@ void allocFrames(AVStream *st, AVFrame **frameRGB, AVFrame **frameYUV, uint8_t *
 	sB1=avpicture_fill((AVPicture *)*frameRGB, buffRGB,AV_PIX_FMT_RGB24,(*frameRGB)->width, (*frameRGB)->height);
 	sB2=avpicture_fill((AVPicture *)*frameYUV, buffYUV,AV_PIX_FMT_YUV420P,(*frameYUV)->width, (*frameYUV)->height);
 
-	printf("Frames allocated with buffers size: %i, %i\n",sB1,sB2);
+	// printf("Frames allocated with buffers size: %i, %i\n",sB1,sB2);
 }
 void deallocFrames(AVFrame *frameRGB, AVFrame *frameYUV, uint8_t *buffRGB, uint8_t *buffYUV){
 	// Free
@@ -86,7 +86,7 @@ void writeHeader(const char *filename,AVFormatContext *oc){
 		printf("Could not write the Header\n");
 		exit(1);
 	}
-	printf("written\n");
+	// printf("written\n");
 }
 void openFormat(const char * filename,AVFormatContext **oc){
 	// Alloc the format context
@@ -99,7 +99,7 @@ void openFormat(const char * filename,AVFormatContext **oc){
 	(*oc)->oformat->audio_codec=CODEC_ID_NONE;
     
 	// Check
-	printf("Using %s: %s\nCodec: %s\n",(*oc)->oformat->name,(*oc)->oformat->long_name,avcodec_get_name((*oc)->oformat->video_codec));
+	printf("Using %s: %s, Codec: %s\n",(*oc)->oformat->name,(*oc)->oformat->long_name,avcodec_get_name((*oc)->oformat->video_codec));
 }
 void openStream(AVFormatContext *oc, AVCodec **codec, AVStream **st, int width, int height, int fps){
 	// first find the codec

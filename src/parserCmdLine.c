@@ -7,6 +7,7 @@
 
 #include "parserCmdLine.h"
 
+// Printing Funciton
 void printUsage(char *string){
 	printf("Usage: %s [Options] filename.mkv *.fits\n",string);
 }
@@ -23,10 +24,61 @@ void printHelp(char *string){
 	printf("s [nx:ny]   set new width and height to rescale the movie.\n");
 	printf("f [fps]     set the desired frame per second rate.\n");
 }
+void printHead(char *message, int nx){
+	int i=0;
+	int	len=strlen(message)+4;
 
-int parseCmdLine(int argc, char *argv[], const char *optString, arguments *arguments){
+	// Compute the left indent
+	int indent=(nx-len)/2;
+
+	printf("\n\033[34m\\");
+	for (i=0; i<indent; i++) printf("*");
+	printf(" %s ",message);
+	for (i=indent+len; i<nx; i++) printf("*");
+	printf("/\033[0m\n");
+}
+void printProgress(int it, int itmax, int nx){
+	char start[10],end[11];
+	int indent, newNX, i;
+
+	// Compute percentage done:
+	float percPrg=it*100.0/(float)itmax;
+	sprintf(start,"It = %i/%i [",it,itmax);
+	sprintf(end,"] %.3f%%",percPrg);
+	printf("%s",start);
+
+	// Compute indent and newNX
+	newNX=nx-strlen(end)-strlen(start);
+	indent=floor(percPrg*newNX/100.0);
+	for (i=0; i< indent-1; i++) printf("=");
+	if (i < newNX-1) printf(">");
+	for (i=indent+1; i<newNX-1; i++) printf(" ");
+	printf(" %s\n",end);
+}
+
+// Checking Function
+bool checkArg(const char *filename){
+	const char *ext=strchr(filename,'.');
+
+	if (!ext) {
+		return false;
+	} else {
+		if (strlen(ext) == strlen(".fits")){
+			if (strcmp(ext,".fits")){
+				printf("false");
+				return false;
+			} else {
+				printf("true");
+				return true;
+			}
+		} else {
+			return true;
+		}
+	}
+}
+
+int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments){
 	int status = 0;
-	char *ext=(char *)malloc(6);
 	int c=0;
 	while (c != -1) {
 		// c=getopt(argc,argv,"d:s::f::h");
@@ -34,11 +86,11 @@ int parseCmdLine(int argc, char *argv[], const char *optString, arguments *argum
 		switch(c){
 		case 'd':
 			arguments->scale=true;
-			sscanf(optarg,"%lf:%lf",&(arguments->dMinMax[0]),&(arguments->dMinMax[1]));
+			sscanf(optarg,"%lf:%lf",&(arguments->dMin),&(arguments->dMax));
 			break;
 		case 's':
 			arguments->resize=true;
-			sscanf(optarg,"%i:%i",&(arguments->NXNY[0]),&(arguments->NXNY[1]));
+			sscanf(optarg,"%i:%i",&(arguments->NX),&(arguments->NY));
 			break;
 		case 'f':
 			arguments->fpsU=true;
@@ -50,13 +102,16 @@ int parseCmdLine(int argc, char *argv[], const char *optString, arguments *argum
 			break;
 		case '?':
 			if (optopt == 'd' || optopt == 's' || optopt == 'f'){
-				fprintf(stderr,"Option %c requires an arguments.\n",optopt);
+				fprintf(stderr,"\033[31mOption %c requires an arguments.\033[0m\n",optopt);
+				printUsage(argv[0]);
 				return 1;
 			} else if (isprint(optopt)){
-				fprintf(stderr,"Unknown options -%c.\n",optopt);
+				fprintf(stderr,"\033[31mUnknown options -%c.\033[0m\n",optopt);
+				printUsage(argv[0]);
 				return 1;
 			} else {
-				fprintf(stderr,"Unknown option Character '\\x%x'.\n",optopt);
+				fprintf(stderr,"\033[31mUnknown option Character '\\x%x'.\033[0m\n",optopt);
+				printUsage(argv[0]);
 				return 1;
 			}
 			break;
@@ -68,26 +123,17 @@ int parseCmdLine(int argc, char *argv[], const char *optString, arguments *argum
 
 	if (arguments->hFlag) return 1;
 
-	if (c == -1) {
-		int count = 0;
-		int ind =0;
-		for (ind = optind; ind < argc; ind++){
-			if (strlen(argv[ind]) > 6){
-				strncpy(ext,argv[ind]+strlen(argv[ind])-5,strlen(argv[ind]));
-				if ((strcmp(ext,".fits") != 0 )){
-					if (*(argv[ind]) != '-'){
-						arguments->output=argv[ind];
-					}
-				} else if (count == 0){
-					arguments->itStart=ind;
-					count++;
-				}
-			}
+	if (c == -1 && optind != argc-1) {
+		arguments->argInd=optind;
+		if (checkArg(argv[optind])){
+			arguments->output=argv[optind];
+			arguments->itStart=optind+1;
+			return 0;
+		} else {
+			return 1;
 		}
-		free(ext);
 		return 0;
 	}else {
-		free(ext);
 		return c;
 	}
 }

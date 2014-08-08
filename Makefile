@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Build script for project
+# Build script for Fits2Movie
 #
 ################################################################################
 project_name := Fits2Movie
@@ -70,14 +70,14 @@ PROJ_LIB      := -L. -L/usr/local/cfitsio/lib -L/usr/local/lib
 
 # OS-specific build flags
 ifneq ($(DARWIN),) 
-      LDFLAGS   := -Xlinker -rpath -Xlinker $(CUDA_LIB_PATH) $(PROJ_LIB) -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -Xlinker -rpath -Xlinker $(CUDA_LIB_PATH) $(PROJ_LIB) -lm -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -Xcompiler -arch -Xcompiler $(OS_ARCH) 
 else
   ifeq ($(OS_SIZE),32)
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -m32
   else
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -m64 
   endif
 endif
