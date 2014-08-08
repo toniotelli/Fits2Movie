@@ -103,15 +103,12 @@ int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments
 		case '?':
 			if (optopt == 'd' || optopt == 's' || optopt == 'f'){
 				fprintf(stderr,"\033[31mOption %c requires an arguments.\033[0m\n",optopt);
-				printUsage(argv[0]);
 				return 1;
 			} else if (isprint(optopt)){
 				fprintf(stderr,"\033[31mUnknown options -%c.\033[0m\n",optopt);
-				printUsage(argv[0]);
 				return 1;
 			} else {
 				fprintf(stderr,"\033[31mUnknown option Character '\\x%x'.\033[0m\n",optopt);
-				printUsage(argv[0]);
 				return 1;
 			}
 			break;
