@@ -329,19 +329,36 @@ int checkCudaDevice(){
 	int NBCudaDev=0;
 	int devN=0;
 	cudaGetDeviceCount(&NBCudaDev);
+	printf("Checking \033[32m%i\033[0m CUDA Devices: \n",NBCudaDev);
 	if (NBCudaDev > 1){
-		devN=1;
-	}
+		// should get the one with the most free space
+		size_t *freMem,*totMem;
+		size_t maxFree;
+		freMem=(size_t *)malloc(NBCudaDev*sizeof(size_t));
+		totMem=(size_t *)malloc(NBCudaDev*sizeof(size_t));
+		for (int i=0; i<NBCudaDev; i++){
+			cudaSetDevice(i);
+			cudaMemGetInfo(&(freMem[i]),&(totMem[i]));
+			printf("----Device %i has %zu MB free\n",i,freMem[i]/1024/1024);
+			if (i == 0) maxFree=freMem[i];
+			if (freMem[i] > maxFree) devN=i;
+		}
 
+		free(freMem);
+		free(totMem);
+	}
+	
 	cudaSetDevice(devN);
 	cudaGetDevice(&devN);
 	cudaDeviceReset();
-
+	size_t f,t;
+	cudaMemGetInfo(&f,&t);
 	cudaSetDeviceFlags(cudaDeviceMapHost);
-	printf("There is \033[32m%i\033[0m CUDA Device using %i",NBCudaDev,devN);
 	cudaDeviceProp dprop;
 	cudaGetDeviceProperties(&dprop, devN);
-	printf(" : \033[34m%s\033[0m\n", dprop.name);
+
+	printf("CUDA Device %i",devN);
+	printf(" : \033[34m%s\033[0m with \033[32m%zu\033[0m/\033[31m%zu\033[0m MB free.\n",dprop.name,f/1024/1024,t/1024/1024);
 	printf("Can Map host Mem : %i\n", dprop.canMapHostMemory);
 
 	// Show device properties
