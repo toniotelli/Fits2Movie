@@ -343,7 +343,7 @@ void check_CUDA_error(const char *message){
 }
 void checkCudaDevice(){
 	int NBCudaDev=0;
-	int devN=1;
+	int devN=0;
 	cudaGetDeviceCount(&NBCudaDev);
 	printf("Checking \033[32m%i\033[0m CUDA Devices: \n",NBCudaDev);
 	if (NBCudaDev > 1){

@@ -135,6 +135,7 @@ int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments
 			case 's':
 				arguments->resize=true;
 				sscanf(optarg,"%i:%i",&(arguments->NX),&(arguments->NY));
+				if (checkUserSize(arguments)) return 1;
 				break;
 			case 'f':
 				arguments->fpsU=true;
