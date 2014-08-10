@@ -19,6 +19,7 @@
 struct arguments{
 	char *output;
 	bool hFlag;
+	bool padding;
 	bool resize;
 	bool scale;
 	bool fpsU;
@@ -37,6 +38,12 @@ void printHead(char *message, int nx);
 void printProgress(int it, int itmax, int nx);
 
 bool checkArg(const char *filename);
+bool check2pow(unsigned int x);
+
+// Image size checking -> Need to be a power of 2 for encoding
+int recomputeImgSz(int x);
+int *checkImgSize(int *imgSz);
+bool checkUserSize(struct arguments *arguments);
 
 const char optString[]="d:s:f:h";
 int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments);

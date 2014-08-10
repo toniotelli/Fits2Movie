@@ -287,13 +287,29 @@ __global__ void convert_fits_RGB_uchar(uint8_t *buff, unsigned char *data, int w
 	}
 }
 
+// Alloc on cuda
+void *allocData(size_t size_data){
+	void *data;
+	cudaMalloc((void **)&data,size_data);
+	check_CUDA_error("Couldn't allocate data!");
+
+	return data;
+}
+void freeData(void *data){
+	cudaFree(data);
+}
+
 // launch Convertion
 void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD, int wave){
+	// Need to check if nx and ny are a multiple of BLOCK
+	int NX= nx/BLOCKX + nx % BLOCKX;
+	int NY= ny/BLOCKY + ny % BLOCKY;
+
 	dim3 dimB(BLOCKX,BLOCKY);
-	dim3 dimG(nx/BLOCKX,ny/BLOCKY);
+	dim3 dimG(NX/BLOCKX,NY/BLOCKY);
 
 	// printf("%i,%i\n",nx,ny);
-	// printf("%i,%i\n",nx/32,ny/32);
+	// printf("%i,%i\n",nx % BLOCKX,ny % BLOCKY);
 
 	// lauch kernel
 	switch(bitpix){
@@ -325,9 +341,9 @@ void check_CUDA_error(const char *message){
 		exit(-1);
 	}
 }
-int checkCudaDevice(){
+void checkCudaDevice(){
 	int NBCudaDev=0;
-	int devN=0;
+	int devN=1;
 	cudaGetDeviceCount(&NBCudaDev);
 	printf("Checking \033[32m%i\033[0m CUDA Devices: \n",NBCudaDev);
 	if (NBCudaDev > 1){
@@ -342,17 +358,21 @@ int checkCudaDevice(){
 			printf("----Device %i has %zu MB free\n",i,freMem[i]/1024/1024);
 			if (i == 0) maxFree=freMem[i];
 			if (freMem[i] > maxFree) devN=i;
+			cudaDeviceReset();
 		}
 
 		free(freMem);
 		free(totMem);
 	}
 	
+	// Set, check and reset CUDA Device
+	size_t f,t;
 	cudaSetDevice(devN);
 	cudaGetDevice(&devN);
-	cudaDeviceReset();
-	size_t f,t;
 	cudaMemGetInfo(&f,&t);
+	cudaDeviceReset();
+
+	// Get Some information
 	cudaSetDeviceFlags(cudaDeviceMapHost);
 	cudaDeviceProp dprop;
 	cudaGetDeviceProperties(&dprop, devN);
@@ -364,5 +384,4 @@ int checkCudaDevice(){
 	// Show device properties
 	printf("Max Treads by block = %i.\n",dprop.maxThreadsPerBlock);
 	printf("Max Grid Size X = %i.\n",dprop.maxGridSize[1]);
-	return NBCudaDev;
 }

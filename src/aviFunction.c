@@ -8,6 +8,14 @@
 
 #include "aviFunction.h"
 
+// Compute buffer size needed
+size_t rgbBuffSize(int nx, int ny){
+	return 3*nx*ny*sizeof(uint8_t);
+}
+size_t yuvBuffSize(int nx, int ny){
+	return 2*nx*ny*sizeof(uint8_t);
+}
+
 // allocation frames
 void allocFrameConversion(AVFrame **frameYUV,uint8_t *buffYUV,int width,int height){
 	// YUV Frame

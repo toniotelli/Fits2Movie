@@ -25,10 +25,9 @@
 #include <stdint.h>
 
 #include <cuda.h>
-#include <cuda_runtime.h>
-// #include <cuda_runtime_api.h>
+// #include <cuda_runtime.h>
+#include <cuda_runtime_api.h>
 #include <math_functions.h>
-//#include <math_functions.h>
 
 // Inline functions in double
 // Red Temperature
@@ -47,11 +46,15 @@ __global__ void convert_fits_RGB_long(uint8_t *buff, long *data, int wave, int n
 __global__ void convert_fits_RGB_shortInt(uint8_t *buff, short int *data, int wave, int nx, int ny, short int minD, short int maxD);
 __global__ void convert_fits_RGB_uchar(uint8_t *buff, unsigned char *data, int wave, int nx, int ny, unsigned char minD, unsigned char maxD);
 
+// Alloc on cuda
+void *allocData(size_t size_data);
+void freeData(void *data);
+
 // launch Convertion
 void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD, int wave);
 
 // Cuda handling
 void check_CUDA_error(const char *message);
-int checkCudaDevice();
+void checkCudaDevice();
 
 #endif

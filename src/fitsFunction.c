@@ -53,6 +53,7 @@ int getImageSize(const char *filename,int *imgS, int *min, int *max,int *wave){
 }
 int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	fitsfile *fts;
+	int nx,ny;
 	int status=0,datatype=0;
 	double nulval=0;
 
@@ -66,9 +67,11 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	// Read DATAMIN, DATAMAX
 	fits_read_key(fts,TINT,"DATAMIN",(void *)min,NULL,&status);
 	fits_read_key(fts,TINT,"DATAMAX",(void *)max,NULL,&status);
+	fits_read_key(fts,TINT,"NAXIS1",(void *)&nx,NULL,&status);
+	fits_read_key(fts,TINT,"NAXIS2",(void *)&ny,NULL,&status);
 	*min=*min-1;
 	*max=*max+1;
-	printf("Data[min,max]=[%i,%i]\n",*min,*max);
+	printf("\033[2KData[min,max]=[%i,%i],\t [nx,ny]=[%i,%i]\n",*min,*max,nx,ny);
 
 	// Data type
 	switch(imgS[0]) {
@@ -90,7 +93,11 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	}
 
 	// Read the image
-	fits_read_img(fts, datatype, 1, imgS[1]*imgS[2], (void *)&nulval, data, NULL, &status);
+	if (nx != imgS[1] || ny != imgS[2]) {
+		fits_read_img(fts, datatype, 1, nx*ny, (void *)&nulval, data, NULL, &status);	
+	} else {
+		fits_read_img(fts, datatype, 1, imgS[1]*imgS[2], (void *)&nulval, data, NULL, &status);
+	}
 	if (status != 0 ){
 		fits_report_error(stderr,status);
 		exit(-1);

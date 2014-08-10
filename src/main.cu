@@ -20,7 +20,6 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 
-
 #include "kernelConv.cuh"
 
 extern "C" {
@@ -51,12 +50,6 @@ int main(int argc, char * argv[]){
 	// Start the event record
 	time(&start);
 
-	// arguments.dMin=dmin;
-	// arguments.dMax=dmax;
-	// arguments.NXNY[0]=0;
-	// arguments.NXNY[1]=0;
-	// arguments.fps=25;
-
 	if (argc == 1) {
 		printUsage(argv[0]);
 		return 1;
@@ -66,7 +59,7 @@ int main(int argc, char * argv[]){
 			printUsage(argv[0]);
 			return 1;
 		}
-		printf("arg of optind = %s\n",argv[arguments.argInd]);
+		
 		if (!arguments.fpsU){
 			arguments.fps=25;
 		}
@@ -82,7 +75,6 @@ int main(int argc, char * argv[]){
 	system("clear");
 	printf("Terminal size = [%i,%i]",ws.ws_col,ws.ws_row);
 	printHead("Welcome to Fits2Movie!",ws.ws_col);
-	// printf("\033[34m\\********************** Welcome to %s! **********************/\033[0m\n",argv[0]);
 	printf("Number of files = \033[32m%i\033[0m\n",argc);
 	printf("Save movie in : \033[32m%s\033[0m\n",arguments.output);
 	printf("First fit files = \033[32m%s\033[0m\n",argv[arguments.itStart]);
@@ -92,16 +84,13 @@ int main(int argc, char * argv[]){
 
 	// Cuda
 	printHead("CUDA Capabilities",ws.ws_col);
-	// printf("\033[34m\\********************** CUDA Capabilities **********************/\033[0m\n");
-	int nbCuda=0;
-	nbCuda=checkCudaDevice();
-	nbCuda+=1; // Just to remove warning
+	checkCudaDevice();
 
 	// Fits Variables
 	printHead("Fits Parameters",ws.ws_col);	
-	// printf("\033[34m\\********************** Fits Parameters **********************/\033[0m\n");
 	int status=0;
-	int imgSize[]={0,0,0};
+	int imgSize[3]={0,0,0};
+	int *newSize;
 	int min=0,max=0;
 	int wave = 0;
 
@@ -115,9 +104,15 @@ int main(int argc, char * argv[]){
 	printf("Image Size = [%i,%i]\n", imgSize[1],imgSize[2]);
 	printf("Wavelenght = %i Angstrom\n",wave);
 
+	// check if image dimension is a power of 2
+	newSize=checkImgSize(imgSize);
+	if (newSize[1] != imgSize[1] || newSize[2] != imgSize[2]) arguments.padding=true;
+	// if (newSize[1] != imgSize[1]) imgSize[1]=newSize[1];
+	// if (newSize[2] != imgSize[2]) imgSize[2]=newSize[2];
+	if (arguments.padding) printf("\033[1;33mWarning\033[m : Images will be padded\n");
+
 	// AVCodec variable
 	printHead("FFMpeg",ws.ws_col);
-	// printf("\n\033[34m\\********************** AVCodec **********************/\033[0m\n");
 	struct AVFormatContext *oc;
 	struct AVCodec *avCodec;
 	struct AVStream *avStream;
@@ -125,12 +120,12 @@ int main(int argc, char * argv[]){
 	struct AVFrame *frameYUVConv;
 
 	// Alloc the frameBuffer for encoding
-	size_t bRGB=3*imgSize[1]*imgSize[2]*sizeof(uint8_t);
-	size_t bYUV=2*imgSize[1]*imgSize[2]*sizeof(uint8_t);
+	size_t bRGB=rgbBuffSize(imgSize[1],imgSize[2]);
+	size_t bYUV=yuvBuffSize(imgSize[1],imgSize[2]);
 	size_t bYUVConv=0;
 	if (arguments.resize) {
 		bYUVConv=bYUV;
-		bYUV=2*arguments.NX*arguments.NY*sizeof(uint8_t);
+		bYUV=yuvBuffSize(arguments.NX,arguments.NY);
 	}
 	uint8_t *hbRGB,*hbYUV,*hbYUVConv;
 	hbRGB=(uint8_t *)malloc(bRGB);
@@ -141,6 +136,7 @@ int main(int argc, char * argv[]){
 
 	// Init avcodec
 	av_register_all();
+	// av_log_set_level(AV_LOG_INFO);
 	av_log_set_level(AV_LOG_ERROR);
 
 	// Open Movie file and alloc necessary stuff
@@ -157,7 +153,6 @@ int main(int argc, char * argv[]){
 		allocFrames(avStream, &frameRGB, &frameYUV, hbRGB, hbYUV, imgSize[1], imgSize[2]);
 	}
 	writeHeader(arguments.output, oc);
-	// printf("Using %s: %s\nCodec: %s\n",oc->oformat->name,oc->oformat->long_name,avcodec_get_name(oc->oformat->video_codec));
 
 	// Alloc buffer fits
 	void *data=NULL;
@@ -167,10 +162,12 @@ int main(int argc, char * argv[]){
 	// Test if cuda works
 	printf("buffer size= %zu, data size = %zu\n",bRGB,sData);
 	uint8_t *dbRGB;
-	cudaMalloc((void **)&dbRGB,bRGB);
 	void *dData;
-	cudaMalloc((void **)&dData, sData);
 
+	// Alloc buffer and data
+	dbRGB=(uint8_t *)allocData(bRGB);
+	dData=allocData(sData);
+	
 	// Run loop
 	printHead("Converting",ws.ws_col);
 	// printf("\n\033[34m\\********************** Converting **********************/\033[0m\n");
@@ -219,8 +216,8 @@ int main(int argc, char * argv[]){
 	printf("Time spent for %i fits of [%i,%i]: \033[31m%f [min]\033[0m\n",argc,imgSize[1],imgSize[2],difftime(stop,start)/60.0);
 	
 	// Free Graphic Memory
-	cudaFree(dbRGB);
-	cudaFree(dData);
+	freeData(dbRGB);
+	freeData(dData);
 	free(data);
 	
 	// dealloc movie files
@@ -231,8 +228,7 @@ int main(int argc, char * argv[]){
 	deallocFrames(frameRGB, frameYUV, hbRGB, hbYUV);
 	if (arguments.resize) deallocFrameConversion(frameYUVConv,hbYUVConv);
 
-	cudaDeviceReset();
+    cudaDeviceReset();
 
-	return 0;
+    return 0;
 }
-

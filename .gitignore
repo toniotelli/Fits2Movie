@@ -6,3 +6,4 @@ Fits2Movie
 *.mkv
 .AppleDouble/*
 */.AppleDouble/*
+*.pro
