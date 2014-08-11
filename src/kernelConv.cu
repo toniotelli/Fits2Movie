@@ -347,6 +347,8 @@ __global__ void pad_fits_image_shortInt(short int *d1, short int *d2, int nx1, i
 			d1[i1]=0.0;
 		// }
 	}
+	printf("%i ",d1[i1]);
+
 }
 __global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
@@ -361,6 +363,7 @@ __global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int n
 			d1[i1]=0.0;
 		// }
 	}
+	printf("%i ",d1[i1]);
 }
 
 // Compute padding
