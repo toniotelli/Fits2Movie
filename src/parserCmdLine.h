@@ -42,8 +42,11 @@ bool check2pow(unsigned int x);
 
 // Image size checking -> Need to be a power of 2 for encoding
 int recomputeImgSz(int x);
-int *checkImgSize(int *imgSz);
+void checkImgSize(int *s0, int *s1);
 bool checkUserSize(struct arguments *arguments);
+
+// Determine output size
+void getFinalSize(struct arguments *argm, int *outS, int *imgS, int *padS, int *resS);
 
 const char optString[]="d:s:f:h";
 int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments);

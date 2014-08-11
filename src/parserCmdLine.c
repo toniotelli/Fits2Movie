@@ -59,12 +59,21 @@ void printProgress(int it, int itmax, int nx){
 // Checking Function
 bool checkArg(const char *filename){
 	const char *ext=strchr(filename,'.');
+	printf("ext = %s\n",ext);
 
 	if (!ext) {
 		return false;
 	} else {
 		if (strlen(ext) == strlen(".fits")){
 			if (strcmp(ext,".fits")){
+				printf("false");
+				return false;
+			} else {
+				printf("true");
+				return true;
+			}
+		} else if (strlen(ext) == strlen(".fts")) {
+			if (!strcmp(ext,".fts")){
 				printf("false");
 				return false;
 			} else {
@@ -86,24 +95,23 @@ int recomputeImgSz(int x){
 	float n=log((float)x)/log(2);
 	return (int)powf(2,floor(n)+1);
 }
-int *checkImgSize(int *imgSz){
-	int newSize[3];
-	// keep BITPIX
-	newSize[0]=imgSz[0];
-	bool nX=check2pow(imgSz[1]);
-	bool nY=check2pow(imgSz[2]);
+void checkImgSize(int *s0, int *s1){
+	bool nX=check2pow(s0[0]);
+	bool nY=check2pow(s0[1]);
 
 	if (!nX || !nY) printf("\033[1;33mWarning :\033[0m Need to Resize Fits:\n");
 	if (!nX) {
-		newSize[1]=recomputeImgSz(imgSz[1]);
-		printf("----Change NX: %i to %i\n",imgSz[1],newSize[1]);
+		s1[0]=recomputeImgSz(s0[0]);
+		printf("----Change NX: %i to %i\n",s0[0],s1[0]);
+	} else {
+		s1[0]=s0[0];	
 	}
 	if (!nY) {
-		newSize[2]=recomputeImgSz(imgSz[2]);
-		printf("----Change NY: %i to %i\n",imgSz[1],newSize[1]);
+		s1[1]=recomputeImgSz(s0[1]);
+		printf("----Change NY: %i to %i\n",s0[1],s1[1]);
+	} else {
+		s1[1]=s0[1];	
 	}
-	
-	return newSize;
 }
 bool checkUserSize(struct arguments *arguments){
 		bool nX,nY;
@@ -120,12 +128,28 @@ bool checkUserSize(struct arguments *arguments){
 		}
 }
 
+// Determine output size
+void getFinalSize(struct arguments *argm, int *outS, int *imgS, int *padS, int *resS){
+	outS[0]=imgS[0];
+	if (argm->resize){
+		outS[1]=resS[1];
+		outS[2]=resS[2];
+	} else {
+		if (argm->padding){
+			outS[1]=padS[1];
+			outS[2]=padS[2];
+		} else {
+			outS[1]=imgS[1];
+			outS[2]=imgS[2];			
+		}
+	}
+}
+
 // Command line parser
 int parseCmdLine(int argc, char *argv[], const char *optString, struct arguments *arguments){
 	int status = 0;
 	int c=0;
 	while (c != -1) {
-		// c=getopt(argc,argv,"d:s::f::h");
 		c=getopt(argc,argv,optString);
 		switch(c){
 			case 'd':

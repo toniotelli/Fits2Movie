@@ -22,7 +22,7 @@ size_t allocDataType(void **data,int datatype,int nx, int ny){
 	*data=malloc(sizeData);
 	return sizeData;
 }
-int getImageSize(const char *filename,int *imgS, int *min, int *max,int *wave){
+int getImageSize(const char *filename, int *bitpix, int *imgS, int *min, int *max,int *wave){
 	fitsfile *fts;
 	int status=0;
 
@@ -34,9 +34,9 @@ int getImageSize(const char *filename,int *imgS, int *min, int *max,int *wave){
 	}
 
 	// Read bitpix, NAXIS1, NAXIS2
-	fits_read_key(fts,TINT,"BITPIX",(void *)&imgS[0],NULL,&status);
-	fits_read_key(fts,TINT,"NAXIS1",(void *)&imgS[1],NULL,&status);
-	fits_read_key(fts,TINT,"NAXIS2",(void *)&imgS[2],NULL,&status);
+	fits_read_key(fts,TINT,"BITPIX",(void *)bitpix,NULL,&status);
+	fits_read_key(fts,TINT,"NAXIS1",(void *)&imgS[0],NULL,&status);
+	fits_read_key(fts,TINT,"NAXIS2",(void *)&imgS[1],NULL,&status);
 
 	// Read DATAMIN, DATAMAX
 	fits_read_key(fts,TINT,"DATAMIN",(void *)min,NULL,&status);
@@ -51,7 +51,7 @@ int getImageSize(const char *filename,int *imgS, int *min, int *max,int *wave){
 	fits_close_file(fts,&status);
 	return status;
 }
-int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
+int readFits(const char *filename,void *data, int bitpix, int *imgS, int *min, int *max){
 	fitsfile *fts;
 	int nx,ny;
 	int status=0,datatype=0;
@@ -74,7 +74,7 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	printf("\033[2KData[min,max]=[%i,%i],\t [nx,ny]=[%i,%i]\n",*min,*max,nx,ny);
 
 	// Data type
-	switch(imgS[0]) {
+	switch(bitpix) {
 	case BYTE_IMG:
 		datatype = TBYTE;
 		break;
@@ -93,10 +93,10 @@ int readFits(const char *filename,void *data, int *imgS, int *min, int *max){
 	}
 
 	// Read the image
-	if (nx != imgS[1] || ny != imgS[2]) {
+	if (nx != imgS[0] || ny != imgS[1]) {
 		fits_read_img(fts, datatype, 1, nx*ny, (void *)&nulval, data, NULL, &status);	
 	} else {
-		fits_read_img(fts, datatype, 1, imgS[1]*imgS[2], (void *)&nulval, data, NULL, &status);
+		fits_read_img(fts, datatype, 1, imgS[0]*imgS[1], (void *)&nulval, data, NULL, &status);
 	}
 	if (status != 0 ){
 		fits_report_error(stderr,status);

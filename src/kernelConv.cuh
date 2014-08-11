@@ -46,12 +46,25 @@ __global__ void convert_fits_RGB_long(uint8_t *buff, long *data, int wave, int n
 __global__ void convert_fits_RGB_shortInt(uint8_t *buff, short int *data, int wave, int nx, int ny, short int minD, short int maxD);
 __global__ void convert_fits_RGB_uchar(uint8_t *buff, unsigned char *data, int wave, int nx, int ny, unsigned char minD, unsigned char maxD);
 
+// pad images
+__global__ void pad_fits_image_double(double *d1, double *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady);
+__global__ void pad_fits_image_float(float *d1, float *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady);
+__global__ void pad_fits_image_long(long *d1, long *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady);
+__global__ void pad_fits_image_shortInt(short int *d1, short int *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady);
+__global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady);
+
+// Compute padding
+int paddingStride(int n1,int n2);
+
 // Alloc on cuda
 void *allocData(size_t size_data);
 void freeData(void *data);
 
 // launch Convertion
 void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD, int wave);
+
+// launch Padding
+void launchPadding(void *d1, void *d2, int bitpix, int nx1, int ny1, int nx2, int ny2);
 
 // Cuda handling
 void check_CUDA_error(const char *message);

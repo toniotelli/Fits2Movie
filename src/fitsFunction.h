@@ -14,8 +14,8 @@
 #include <fitsio.h>
 
 size_t allocDataType(void **data,int datatype,int nx, int ny);
-int getImageSize(const char *filename,int *imgS, int *min, int *max,int *wave);
-int readFits(const char *filename,void *data, int *imgS, int *min, int *max);
+int getImageSize(const char *filename, int *bitpix, int *imgS, int *min, int *max,int *wave);
+int readFits(const char *filename,void *data, int bitpix, int *imgS, int *min, int *max);
 
 
 #endif

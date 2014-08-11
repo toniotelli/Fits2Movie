@@ -287,6 +287,87 @@ __global__ void convert_fits_RGB_uchar(uint8_t *buff, unsigned char *data, int w
 	}
 }
 
+// pad images
+__global__ void pad_fits_image_double(double *d1, double *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int i1=y*nx2+x; 
+	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+
+	if (i1 < nx2*ny2){
+		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+			d1[i1]=d2[i2];
+		} else {
+			d1[i1]=0.0;
+		// }
+	}
+	printf("%i ",d1[i1]);
+}
+__global__ void pad_fits_image_float(float *d1, float *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int i1=y*nx2+x; 
+	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+
+	if (i1 < nx2*ny2){
+		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+			d1[i1]=d2[i2];
+		} else {
+			d1[i1]=0.0;
+		// }
+	}
+	printf("%i ",d1[i1]);
+}
+__global__ void pad_fits_image_long(long *d1, long *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int i1=y*nx2+x; 
+	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+
+	if (i1 < nx2*ny2){
+		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+			d1[i1]=d2[i2];
+		} else {
+			d1[i1]=0.0;
+		// }
+	}
+	printf("%i ",d1[i1]);
+
+}
+__global__ void pad_fits_image_shortInt(short int *d1, short int *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int i1=y*nx2+x; 
+	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+
+	if (i1 < nx2*ny2){
+		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+			d1[i1]=d2[i2];
+		} else {
+			d1[i1]=0.0;
+		// }
+	}
+}
+__global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
+	int x=blockDim.x*blockIdx.x+threadIdx.x;
+	int y=blockDim.y*blockIdx.y+threadIdx.y;
+	int i1=y*nx2+x; 
+	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+
+	if (i1 < nx2*ny2){
+		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+			d1[i1]=d2[i2];
+		} else {
+			d1[i1]=0.0;
+		// }
+	}
+}
+
+// Compute padding
+int paddingStride(int n1,int n2){
+	return (n1-n2)/2;
+}
+
 // Alloc on cuda
 void *allocData(size_t size_data){
 	void *data;
@@ -330,6 +411,42 @@ void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, dou
 		break;
 	}
 	cudaDeviceSynchronize();
+	check_CUDA_error("Convertion");
+}
+
+// launch Padding
+void launchPadding(void *d1, void *d2, int bitpix, int nx1, int ny1, int nx2, int ny2){
+	dim3 dimB(BLOCKX,BLOCKY);
+	dim3 dimG(nx1/BLOCKX,ny1/BLOCKY);
+
+	int padx = paddingStride(nx1,nx2);
+	int pady = paddingStride(ny1,ny2);
+
+	printf("Stride = [%i,%i]\n",padx,pady);
+
+	// lauch kernel
+	switch(bitpix){
+	case BYTE_IMG:
+		pad_fits_image_uchar<<<dimG,dimB>>>((unsigned char *)d1,(unsigned char *)d2,nx1,ny1,nx2,ny2,padx,pady);
+		cudaDeviceSynchronize();
+		break;
+	case SHORT_IMG:
+		pad_fits_image_shortInt<<<dimG,dimB>>>((short int *)d1,(short int *)d2,nx1,ny1,nx2,ny2,padx,pady);
+		cudaDeviceSynchronize();
+		break;
+	case LONG_IMG:
+		pad_fits_image_long<<<dimG,dimB>>>((long *)d1,(long *)d2,nx1,ny1,nx2,ny2,padx,pady);
+		cudaDeviceSynchronize();
+		break;
+	case FLOAT_IMG:
+		pad_fits_image_float<<<dimG,dimB>>>((float *)d1,(float *)d2,nx1,ny1,nx2,ny2,padx,pady);
+		cudaDeviceSynchronize();
+		break;
+	case DOUBLE_IMG:
+		pad_fits_image_double<<<dimG,dimB>>>((double *)d1,(double *)d2,nx1,ny1,nx2,ny2,padx,pady);
+		cudaDeviceSynchronize();
+		break;
+	}
 	check_CUDA_error("Convertion");
 }
 
