@@ -301,22 +301,20 @@ __global__ void pad_fits_image_double(double *d1, double *d2, int nx1, int ny1, 
 			d1[i1]=0.0;
 		// }
 	}
-	printf("%i ",d1[i1]);
 }
 __global__ void pad_fits_image_float(float *d1, float *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int i1=y*nx2+x; 
-	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+	int i1=y*nx1+x; 
+	int i2=(y-pady)*nx2+x-padx;
 
-	if (i1 < nx2*ny2){
-		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
-			d1[i1]=d2[i2];
+	if (i1 < nx1*ny1){
+		if (x>=padx && y>=pady && x<nx2-padx && y<ny1-pady){
+			d1[i1]=500;//d2[i2];
 		} else {
 			d1[i1]=0.0;
-		// }
+		}
 	}
-	printf("%i ",d1[i1]);
 }
 __global__ void pad_fits_image_long(long *d1, long *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
@@ -331,8 +329,6 @@ __global__ void pad_fits_image_long(long *d1, long *d2, int nx1, int ny1, int nx
 			d1[i1]=0.0;
 		// }
 	}
-	printf("%i ",d1[i1]);
-
 }
 __global__ void pad_fits_image_shortInt(short int *d1, short int *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
@@ -347,8 +343,6 @@ __global__ void pad_fits_image_shortInt(short int *d1, short int *d2, int nx1, i
 			d1[i1]=0.0;
 		// }
 	}
-	printf("%i ",d1[i1]);
-
 }
 __global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
@@ -363,7 +357,6 @@ __global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int n
 			d1[i1]=0.0;
 		// }
 	}
-	printf("%i ",d1[i1]);
 }
 
 // Compute padding
@@ -386,14 +379,14 @@ void freeData(void *data){
 // launch Convertion
 void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, double minD, double maxD, int wave){
 	// Need to check if nx and ny are a multiple of BLOCK
-	int NX= nx/BLOCKX + nx % BLOCKX;
-	int NY= ny/BLOCKY + ny % BLOCKY;
+	int NX= nx/BLOCKX;// + nx % BLOCKX;
+	int NY= ny/BLOCKY;// + ny % BLOCKY;
 
 	dim3 dimB(BLOCKX,BLOCKY);
 	dim3 dimG(NX/BLOCKX,NY/BLOCKY);
 
-	// printf("%i,%i\n",nx,ny);
-	// printf("%i,%i\n",nx % BLOCKX,ny % BLOCKY);
+	printf("%i,%i\n",nx,ny);
+	printf("%i,%i\n",nx % BLOCKX,ny % BLOCKY);
 
 	// lauch kernel
 	switch(bitpix){
@@ -425,27 +418,31 @@ void launchPadding(void *d1, void *d2, int bitpix, int nx1, int ny1, int nx2, in
 	int padx = paddingStride(nx1,nx2);
 	int pady = paddingStride(ny1,ny2);
 
-	printf("Stride = [%i,%i]\n",padx,pady);
 
 	// lauch kernel
 	switch(bitpix){
 	case BYTE_IMG:
+		printf("Stride uchar = [%i,%i]\n",padx,pady);
 		pad_fits_image_uchar<<<dimG,dimB>>>((unsigned char *)d1,(unsigned char *)d2,nx1,ny1,nx2,ny2,padx,pady);
 		cudaDeviceSynchronize();
 		break;
 	case SHORT_IMG:
+		printf("Stride shortInt = [%i,%i]\n",padx,pady);
 		pad_fits_image_shortInt<<<dimG,dimB>>>((short int *)d1,(short int *)d2,nx1,ny1,nx2,ny2,padx,pady);
 		cudaDeviceSynchronize();
 		break;
 	case LONG_IMG:
+		printf("Stride long = [%i,%i]\n",padx,pady);
 		pad_fits_image_long<<<dimG,dimB>>>((long *)d1,(long *)d2,nx1,ny1,nx2,ny2,padx,pady);
 		cudaDeviceSynchronize();
 		break;
 	case FLOAT_IMG:
+		printf("Stride float = [%i,%i]\n",padx,pady);
 		pad_fits_image_float<<<dimG,dimB>>>((float *)d1,(float *)d2,nx1,ny1,nx2,ny2,padx,pady);
 		cudaDeviceSynchronize();
 		break;
 	case DOUBLE_IMG:
+		printf("Stride double = [%i,%i]\n",padx,pady);
 		pad_fits_image_double<<<dimG,dimB>>>((double *)d1,(double *)d2,nx1,ny1,nx2,ny2,padx,pady);
 		cudaDeviceSynchronize();
 		break;

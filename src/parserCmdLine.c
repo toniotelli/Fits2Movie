@@ -86,14 +86,18 @@ bool checkArg(const char *filename){
 	}
 }
 bool check2pow(unsigned int x){
-	return ( x !=0 && !(x & x-1));
+	return ((x % 16) == 0);
 }
+// bool check2pow(unsigned int x){
+// 	return ( x !=0 && !(x & x-1));
+// }
 
 // Image size checking -> Need to be a power of 2 for encoding
 int recomputeImgSz(int x){
 	// Get the lowest power of 2
-	float n=log((float)x)/log(2);
-	return (int)powf(2,floor(n)+1);
+	// float n=log((float)x)/log(2);
+	// return (int)powf(2,floor(n)+1);
+	return ((x/16)+1)*16;
 }
 void checkImgSize(int *s0, int *s1){
 	bool nX=check2pow(s0[0]);

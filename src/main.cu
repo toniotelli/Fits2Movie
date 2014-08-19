@@ -159,8 +159,11 @@ int main(int argc, char * argv[]){
 	
 	// Init avcodec
 	av_register_all();
-	av_log_set_level(AV_LOG_INFO);
-	// av_log_set_level(AV_LOG_ERROR);
+	// av_log_set_level(AV_LOG_MAX_OFFSET);
+	// av_log_set_level(AV_LOG_DEBUG);
+	// av_log_set_level(AV_LOG_INFO);
+	av_log_set_level(AV_LOG_ERROR);
+
 
 	// Open Movie file and alloc necessary stuff
 	remove(argm.output);
@@ -176,15 +179,15 @@ int main(int argc, char * argv[]){
 	writeHeader(argm.output, oc);
 
 	// Alloc buffer fits
-	void *data=NULL,*rubbish=NULL;
+	void *data=NULL,*dataTemp=NULL;
 	size_t sData=0,rData=0;
 	sData=allocDataType(&data,bitpix,iS[0],iS[1]);
-	if (argm.padding) rData=allocDataType(&rubbish,bitpix,tS[0],tS[1]);
+	if (argm.padding) rData=allocDataType(&dataTemp,bitpix,tS[0],tS[1]);
 	printf("buffer size= %zu, data size = %zu, padded data size = %zu\n",sRGB,sData,rData);
 
 	// Alloc buffer and data
 	uint8_t *bufRGB=(uint8_t *)allocData(sRGB);
-	void *dData,*dDataTemp;
+	void *dData=NULL,*dDataTemp=NULL;
 	if (argm.padding){
 		dDataTemp=allocData(sData);
 		dData=allocData(rData);
@@ -196,6 +199,7 @@ int main(int argc, char * argv[]){
 	printHead("Converting",ws.ws_col);
 	// printf("\n\033[34m\\********************** Converting **********************/\033[0m\n");
 	for (int i=argm.itStart; i<argc; i++) {
+		// printf("\033[7Fits: %s\n",argv[i]);
 		printf("Fits: %s\n",argv[i]);
 		status=readFits(argv[i],data,bitpix,iS,&min,&max);
 
@@ -218,7 +222,7 @@ int main(int argc, char * argv[]){
 			dmin=argm.dMin;
 			dmax=argm.dMax;
 		}
-		printf("User[min,max]=[%lf,%lf]\n",dmin,dmax);
+		printf("User[min,max]=[%lf,%lf], [%i,%i]\n",dmin,dmax,tS[0],tS[1]);
 
 		// launch the process
 		launchConvertion(bufRGB, dData, bitpix, tS[0], tS[1], dmin, dmax, wave);
@@ -238,13 +242,15 @@ int main(int argc, char * argv[]){
 
 		// Progress and cpu ticks
 		printProgress(i, argc-1,ws.ws_col);
-		if (i < argc-1) {
-			if (argm.padding) {
-				printf("\033[5A");
-			} else {
-				printf("\033[4A");
-			}
-		}
+		// printf("\033[8");
+		// if (i < argc-1) printf("\033[7A");
+		// if (i < argc-1) {
+		// 	if (argm.padding) {
+		// 		printf("\033[5A");
+		// 	} else {
+		// 		printf("\033[4A");
+		// 	}
+		// }
 		ticks=clock();
 	}
 	
