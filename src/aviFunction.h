@@ -27,8 +27,8 @@
 #include <libavutil/timestamp.h>
 
 // Compute buffer size needed
-size_t rgbBuffSize(int nx, int ny);
-size_t yuvBuffSize(int nx, int ny);
+size_t computeRGBSize(int nx, int ny);
+size_t computeYUVSize(int nx, int ny);
 
 // allocation frames
 void allocFrameConversion(AVFrame **frameYUV,uint8_t *buffYUV,int width,int height);

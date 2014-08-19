@@ -291,15 +291,15 @@ __global__ void convert_fits_RGB_uchar(uint8_t *buff, unsigned char *data, int w
 __global__ void pad_fits_image_double(double *d1, double *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int i1=y*nx2+x; 
-	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+	int i1=y*nx1+x; 
+	int i2=(y-pady)*nx2+x-padx;
 
-	if (i1 < nx2*ny2){
-		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+	if (i1 < nx1*ny1){
+		if (x>=padx && y>=pady && x<nx2-padx && y<ny1-pady){
 			d1[i1]=d2[i2];
 		} else {
 			d1[i1]=0.0;
-		// }
+		}
 	}
 }
 __global__ void pad_fits_image_float(float *d1, float *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
@@ -310,7 +310,7 @@ __global__ void pad_fits_image_float(float *d1, float *d2, int nx1, int ny1, int
 
 	if (i1 < nx1*ny1){
 		if (x>=padx && y>=pady && x<nx2-padx && y<ny1-pady){
-			d1[i1]=500;//d2[i2];
+			d1[i1]=d2[i2];
 		} else {
 			d1[i1]=0.0;
 		}
@@ -319,43 +319,43 @@ __global__ void pad_fits_image_float(float *d1, float *d2, int nx1, int ny1, int
 __global__ void pad_fits_image_long(long *d1, long *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int i1=y*nx2+x; 
-	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+	int i1=y*nx1+x; 
+	int i2=(y-pady)*nx2+x-padx;
 
-	if (i1 < nx2*ny2){
-		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+	if (i1 < nx1*ny1){
+		if (x>=padx && y>=pady && x<nx2-padx && y<ny1-pady){
 			d1[i1]=d2[i2];
 		} else {
 			d1[i1]=0.0;
-		// }
+		}
 	}
 }
 __global__ void pad_fits_image_shortInt(short int *d1, short int *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int i1=y*nx2+x; 
-	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+	int i1=y*nx1+x; 
+	int i2=(y-pady)*nx2+x-padx;
 
-	if (i1 < nx2*ny2){
-		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+	if (i1 < nx1*ny1){
+		if (x>=padx && y>=pady && x<nx2-padx && y<ny1-pady){
 			d1[i1]=d2[i2];
 		} else {
 			d1[i1]=0.0;
-		// }
+		}
 	}
 }
 __global__ void pad_fits_image_uchar(unsigned char *d1, unsigned char *d2, int nx1, int ny1, int nx2, int ny2, int padx, int pady){
 	int x=blockDim.x*blockIdx.x+threadIdx.x;
 	int y=blockDim.y*blockIdx.y+threadIdx.y;
-	int i1=y*nx2+x; 
-	int i2=y*nx2+x; ;//(y-pady)*nx2+x-padx;
+	int i1=y*nx1+x; 
+	int i2=(y-pady)*nx2+x-padx;
 
-	if (i1 < nx2*ny2){
-		// if (x>padx && y>pady && x<nx2-padx && y<ny1-pady){
+	if (i1 < nx1*ny1){
+		if (x>=padx && y>=pady && x<nx2-padx && y<ny1-pady){
 			d1[i1]=d2[i2];
 		} else {
 			d1[i1]=0.0;
-		// }
+		}
 	}
 }
 

@@ -9,10 +9,10 @@
 #include "aviFunction.h"
 
 // Compute buffer size needed
-size_t rgbBuffSize(int nx, int ny){
+size_t computeRGBSize(int nx, int ny){
 	return 3*nx*ny*sizeof(uint8_t);
 }
-size_t yuvBuffSize(int nx, int ny){
+size_t computeYUVSize(int nx, int ny){
 	return 2*nx*ny*sizeof(uint8_t);
 }
 

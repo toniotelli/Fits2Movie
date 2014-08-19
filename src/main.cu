@@ -135,6 +135,12 @@ int main(int argc, char * argv[]){
 	printf("Tempo Size: [%i,%i]\n",tS[0],tS[1]);
 	printf("Final Size: [%i,%i]\n",fS[0],fS[1]);
 
+	// Put an exit choice
+	char ch;
+	printf("Continue: [Y/n]:");
+	scanf("%c",ch);
+	if (ch == 'n') return EXIT_FAILURE;
+
 	// AVCodec variable
 	printHead("FFMpeg",ws.ws_col);
 	struct AVFormatContext *oc;
@@ -148,9 +154,9 @@ int main(int argc, char * argv[]){
 	uint8_t *hbRGB,*hbTemp,*hbFinal;
 
 	// Compute the size of needed buffer for libav
-	sRGB=rgbBuffSize(tS[0],tS[1]);
-	sTemp=yuvBuffSize(tS[0],tS[1]);
-	sFinal=yuvBuffSize(fS[0],fS[1]);
+	sRGB=computeRGBSize(tS[0],tS[1]);
+	sTemp=computeYUVSize(tS[0],tS[1]);
+	sFinal=computeYUVSize(fS[0],fS[1]);
 
 	// Alloc the necessary memory space
 	hbRGB=(uint8_t *)malloc(sRGB);
@@ -159,10 +165,10 @@ int main(int argc, char * argv[]){
 	
 	// Init avcodec
 	av_register_all();
-	// av_log_set_level(AV_LOG_MAX_OFFSET);
+	av_log_set_level(AV_LOG_MAX_OFFSET);
 	// av_log_set_level(AV_LOG_DEBUG);
 	// av_log_set_level(AV_LOG_INFO);
-	av_log_set_level(AV_LOG_ERROR);
+	// av_log_set_level(AV_LOG_ERROR);
 
 
 	// Open Movie file and alloc necessary stuff
