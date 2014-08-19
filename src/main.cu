@@ -112,7 +112,7 @@ int main(int argc, char * argv[]){
 
 	// define size of temporary and final frame
 	argm.padding=checkImgSize(iS,tS);
-	printf("argm.padding = %i",argm.padding);
+	printf("argm.padding = %i\n",argm.padding);
 
 	// Check if images needs to be padded
 	// if ((tS[0] != iS[0] || tS[1] != iS[1]) && (tS[0] !=0 || tS[1] != 0)) argm.padding=true;
@@ -154,9 +154,9 @@ int main(int argc, char * argv[]){
 	uint8_t *hbRGB,*hbTemp,*hbFinal;
 
 	// Compute the size of needed buffer for libav
-	sRGB=computeRGBSize(tS[0],tS[1]);
-	sTemp=computeYUVSize(tS[0],tS[1]);
-	sFinal=computeYUVSize(fS[0],fS[1]);
+	sRGB=computeRGBSize(tS[0],tS[1]);	// Size of Buffer RGB data: no-padded/padded
+	sTemp=computeYUVSize(tS[0],tS[1]);	// Size of Buffer YUV data: no-padded/padded
+	sFinal=computeYUVSize(fS[0],fS[1]); // Size of Final Buffer data: no-padded/padded,resized (YUVSpace)
 
 	// Alloc the necessary memory space
 	hbRGB=(uint8_t *)malloc(sRGB);
@@ -212,12 +212,15 @@ int main(int argc, char * argv[]){
 		// copy data to device
 		if (argm.padding){
 			cudaMemcpy(dDataTemp, data, sData, cudaMemcpyHostToDevice);
+			cudaDeviceSynchronize();
 			check_CUDA_error("Copying H to D");
 
 			// launch the padding kernel
 			launchPadding(dData,dDataTemp,bitpix,tS[0],tS[1],iS[0],iS[1]);
+			cudaDeviceSynchronize();
 		} else {
 			cudaMemcpy(dData, data, sData, cudaMemcpyHostToDevice);
+			cudaDeviceSynchronize();
 			check_CUDA_error("Copying H to D");
 		}
 
@@ -232,9 +235,11 @@ int main(int argc, char * argv[]){
 
 		// launch the process
 		launchConvertion(bufRGB, dData, bitpix, tS[0], tS[1], dmin, dmax, wave);
+		cudaDeviceSynchronize();
 
 		// copy back buffRGB to host
 		cudaMemcpy(hbRGB,bufRGB,sRGB,cudaMemcpyDeviceToHost);
+		cudaDeviceSynchronize();
 		check_CUDA_error("Copying D to H");
 
 		// Rescale and encode frame

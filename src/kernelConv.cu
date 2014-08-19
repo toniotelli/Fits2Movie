@@ -385,7 +385,8 @@ void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, dou
 	dim3 dimB(BLOCKX,BLOCKY);
 	dim3 dimG(NX/BLOCKX,NY/BLOCKY);
 
-	printf("%i,%i\n",nx,ny);
+	printf("Checking kernel grid size: nx,ny, \%,\%:");
+	printf("%i,%i, ",nx,ny);
 	printf("%i,%i\n",nx % BLOCKX,ny % BLOCKY);
 
 	// lauch kernel
