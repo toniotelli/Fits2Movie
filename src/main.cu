@@ -136,7 +136,7 @@ int main(int argc, char * argv[]){
 	printf("Final Size: [%i,%i]\n",fS[0],fS[1]);
 
 	// Put an exit choice
-	char ch='';
+	int ch;
 	printf("Continue: [Y/n]:");
 	ch=getchar();
 	if (ch == 'n') return EXIT_FAILURE;
