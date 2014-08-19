@@ -99,7 +99,7 @@ int recomputeImgSz(int x){
 	// return (int)powf(2,floor(n)+1);
 	return ((x/16)+1)*16;
 }
-void checkImgSize(int *s0, int *s1){
+bool checkImgSize(int *s0, int *s1){
 	bool nX=check2pow(s0[0]);
 	bool nY=check2pow(s0[1]);
 
@@ -116,6 +116,7 @@ void checkImgSize(int *s0, int *s1){
 	} else {
 		s1[1]=s0[1];	
 	}
+	return (!nX || !nY);
 }
 bool checkUserSize(struct arguments *arguments){
 		bool nX,nY;

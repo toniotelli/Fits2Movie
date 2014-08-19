@@ -111,11 +111,11 @@ int main(int argc, char * argv[]){
 	printf("Wavelenght = %i Angstrom\n",wave);
 
 	// define size of temporary and final frame
-	checkImgSize(iS,tS);
-	printf("Tempo Size: [%i,%i]\n",tS[0],tS[1]);	
-
+	argm.padding=checkImgSize(iS,tS);
+	printf("argm.padding = %i",argm.padding);
+	
 	// Check if images needs to be padded
-	if ((tS[0] != iS[0] || tS[1] != iS[1]) && (tS[0] !=0 || tS[1] != 0)) argm.padding=true;
+	// if ((tS[0] != iS[0] || tS[1] != iS[1]) && (tS[0] !=0 || tS[1] != 0)) argm.padding=true;
 	if (argm.padding) printf("\033[1;33mWarning\033[m : Images will be padded\n");
 	if (!argm.resize) {
 		if (argm.padding) {
@@ -136,9 +136,9 @@ int main(int argc, char * argv[]){
 	printf("Final Size: [%i,%i]\n",fS[0],fS[1]);
 
 	// Put an exit choice
-	char ch;
+	char ch='';
 	printf("Continue: [Y/n]:");
-	scanf("%c",ch);
+	scanf("%c",&ch);
 	if (ch == 'n') return EXIT_FAILURE;
 
 	// AVCodec variable

@@ -42,7 +42,7 @@ bool check2pow(unsigned int x);
 
 // Image size checking -> Need to be a power of 2 for encoding
 int recomputeImgSz(int x);
-void checkImgSize(int *s0, int *s1);
+bool checkImgSize(int *s0, int *s1);
 bool checkUserSize(struct arguments *arguments);
 
 // Determine output size
