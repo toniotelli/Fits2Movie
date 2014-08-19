@@ -136,10 +136,10 @@ int main(int argc, char * argv[]){
 	printf("Final Size: [%i,%i]\n",fS[0],fS[1]);
 
 	// Put an exit choice
-	char ch[]="";
+	char ch='';
 	printf("Continue: [Y/n]:");
-	scanf("%c",ch);
-	if (ch[0] == 'n') return EXIT_FAILURE;
+	ch=getchar();
+	if (ch == 'n') return EXIT_FAILURE;
 
 	// AVCodec variable
 	printHead("FFMpeg",ws.ws_col);
