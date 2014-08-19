@@ -165,10 +165,10 @@ int main(int argc, char * argv[]){
 	
 	// Init avcodec
 	av_register_all();
-	av_log_set_level(AV_LOG_MAX_OFFSET);
+	// av_log_set_level(AV_LOG_MAX_OFFSET);
 	// av_log_set_level(AV_LOG_DEBUG);
 	// av_log_set_level(AV_LOG_INFO);
-	// av_log_set_level(AV_LOG_ERROR);
+	av_log_set_level(AV_LOG_ERROR);
 
 
 	// Open Movie file and alloc necessary stuff
@@ -255,13 +255,13 @@ int main(int argc, char * argv[]){
 		printProgress(i, argc-1,ws.ws_col);
 		// printf("\033[8");
 		// if (i < argc-1) printf("\033[7A");
-		// if (i < argc-1) {
-		// 	if (argm.padding) {
-		// 		printf("\033[5A");
-		// 	} else {
-		// 		printf("\033[4A");
-		// 	}
-		// }
+		if (i < argc-1) {
+			if (argm.padding) {
+				printf("\033[5A");
+			} else {
+				printf("\033[4A");
+			}
+		}
 		ticks=clock();
 	}
 	
