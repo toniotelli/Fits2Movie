@@ -383,7 +383,7 @@ void launchConvertion(uint8_t *buff, void *data, int bitpix, int nx, int ny, dou
 	int NY= ny/BLOCKY;// + ny % BLOCKY;
 
 	dim3 dimB(BLOCKX,BLOCKY);
-	dim3 dimG(NX/BLOCKX,NY/BLOCKY);
+	dim3 dimG(NX,NY);
 
 	printf("Checking kernel grid size: nx,ny, \%,\%:");
 	printf("%i,%i, ",nx,ny);
