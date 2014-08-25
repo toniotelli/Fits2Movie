@@ -4,7 +4,7 @@
 //
 //  Created by Antoine Genetelli on 27/05/14.
 //  Copyright (c) 2014 Antoine Genetelli. All rights reserved.
-//
+//	email : antoine.genetelli@mac.com
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -73,7 +73,6 @@ int main(int argc, char * argv[]){
 	}
 
 	system("clear");
-	printf("Terminal size = [%i,%i]",ws.ws_col,ws.ws_row);
 	printHead("Welcome to Fits2Movie!",ws.ws_col);
 	printf("Number of files = \033[32m%i\033[0m\n",argc);
 	printf("Save movie in : \033[32m%s\033[0m\n",argm.output);

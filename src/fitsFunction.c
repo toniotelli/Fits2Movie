@@ -1,3 +1,11 @@
+//
+//  fitsFunction.c
+//  Fits2Movie
+//
+//  Created by Antoine Genetelli on 27/05/14.
+//  Copyright (c) 2014 Antoine Genetelli. All rights reserved.
+//	email : antoine.genetelli@mac.com
+
 #include "fitsFunction.h"
 
 size_t allocDataType(void **data,int datatype,int nx, int ny){
