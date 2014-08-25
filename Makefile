@@ -68,8 +68,8 @@ ifneq ($(DARWIN),)
 	CFITSIO_INC := $(CFITSIO_PATH)/include
 	CFITSIO_LIB := $(CFITSIO_PATH)/lib -lcfitsio
 else
-	CFITSIO_INC := $(pkg-config --cfags cfitsio)
-	CFITSIO_LIB := $(pkg-config --libs cfitsio)
+	CFITSIO_INC := $(shell pkg-config --cfags cfitsio)
+	CFITSIO_LIB := $(shell pkg-config --libs cfitsio)
 endif
 
 PROJ_INCLUDES := -I/usr/local/include -Isrc -I$(CFITSIO_INC)
