@@ -148,3 +148,8 @@ printObjs:
 printSrc: 
 	echo $(SRCS)
 
+# Check Cfitsio
+printC:
+	echo $(CFITSIO_INC)
+	echo $(CFITSIO_LIB)
+
