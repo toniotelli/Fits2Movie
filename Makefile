@@ -82,10 +82,10 @@ ifneq ($(DARWIN),)
       CCFLAGS   := -Xcompiler -arch -Xcompiler $(OS_ARCH) 
 else
   ifeq ($(OS_SIZE),32)
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcfitsio -lcuda -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -m32
   else
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcfitsio -lcuda -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -m64 
   endif
 endif
