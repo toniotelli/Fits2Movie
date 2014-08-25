@@ -68,7 +68,7 @@ ifneq ($(DARWIN),)
 	CFITSIO_INC := $(CFITSIO_PATH)/include
 	CFITSIO_LIB := $(CFITSIO_PATH)/lib -lcfitsio
 else
-	CFITSIO_INC := $(shell pkg-config --cfags cfitsio)
+	CFITSIO_INC := $(shell pkg-config --cflags cfitsio)
 	CFITSIO_LIB := $(shell pkg-config --libs cfitsio)
 endif
 
