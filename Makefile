@@ -64,20 +64,28 @@ GENCODE_FLAGS   := $(GENCODE_SM10) $(GENCODE_SM35)
 # Define Include and library PATH
 PROJECT_PATH   = $(shell pwd)
 
-PROJ_INCLUDES := -I/usr/local/cfitsio/include -I/usr/local/include -Isrc
-PROJ_LIB      := -L. -L/usr/local/cfitsio/lib -L/usr/local/lib
+ifneq ($(DARWIN),)
+	CFITSIO_INC := CFITSIO_PATH/include
+	CFITSIO_LIB := CFITSIO_PATH/lib -lcfitsio
+else
+	CFITSIO_INC := $(pkg-config --cfags cfitsio)
+	CFITSIO_LIB := $(pkg-config --libs cfitsio)
+endif
+
+PROJ_INCLUDES := -I/usr/local/include -Isrc -I$(CFITSIO_INC)
+PROJ_LIB      := -L. -L/usr/local/lib -L$(CFITSIO_LIB)
 
 
 # OS-specific build flags
 ifneq ($(DARWIN),) 
-      LDFLAGS   := -Xlinker -rpath -Xlinker $(CUDA_LIB_PATH) $(PROJ_LIB) -lm -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -Xlinker -rpath -Xlinker $(CUDA_LIB_PATH) $(PROJ_LIB) -lm -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -Xcompiler -arch -Xcompiler $(OS_ARCH) 
 else
   ifeq ($(OS_SIZE),32)
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -m32
   else
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lcfitsio -lavcodec -lavformat -lavutil -lswscale -lswresample
+      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart -L/usr/local/cfitsio/lib $(PROJ_LIB) -lm -lcuda -lavcodec -lavformat -lavutil -lswscale -lswresample
       CCFLAGS   := -m64 
   endif
 endif
