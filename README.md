@@ -24,4 +24,26 @@ OS you are running. I do not have a window
 machine, I don't know how it will compile
 under any version of window.
 
-If you are under 
+If you are under Mac OS, you need to define
+CFITSIO_PATH pointing to the install directory 
+of your cfitsio build.
+If you are under Linux, you need that cfitsio.pc
+is part of PKG_CONFIG_PATH
+
+Building ...
+
+In a terminal, type:
+
+make clean all
+
+
+Running ...
+
+In a terminal, type:
+
+./Fits2Movie
+
+it will print a usage message
+
+If you encounter any trouble, do not hesitate to contact me:
+antoine.genetelli@mac.com
