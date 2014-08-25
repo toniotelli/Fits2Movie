@@ -65,15 +65,15 @@ GENCODE_FLAGS   := $(GENCODE_SM10) $(GENCODE_SM35)
 PROJECT_PATH   = $(shell pwd)
 
 ifneq ($(DARWIN),)
-	CFITSIO_INC := CFITSIO_PATH/include
-	CFITSIO_LIB := CFITSIO_PATH/lib -lcfitsio
+	CFITSIO_INC := $(CFITSIO_PATH)/include
+	CFITSIO_LIB := $(CFITSIO_PATH)/lib -lcfitsio
 else
 	CFITSIO_INC := $(pkg-config --cfags cfitsio)
 	CFITSIO_LIB := $(pkg-config --libs cfitsio)
 endif
 
 PROJ_INCLUDES := -I/usr/local/include -Isrc -I$(CFITSIO_INC)
-PROJ_LIB      := -L. -L/usr/local/lib -L$(CFITSIO_LIB)
+PROJ_LIB      := -L/usr/local/lib -Lbuild -L$(CFITSIO_LIB)
 
 
 # OS-specific build flags
